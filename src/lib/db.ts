@@ -73,7 +73,9 @@ async function initDb(): Promise<DatabaseWrapper> {
     return new DatabaseWrapper(sqlDb);
   }
 
-  const SQL = await initSqlJs();
+  const SQL = await initSqlJs({
+    locateFile: (file: string) => `https://sql.js.org/dist/${file}`
+  });
 
   // Try to load existing DB from file (local dev only)
   if (!IS_VERCEL) {

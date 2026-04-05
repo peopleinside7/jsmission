@@ -3,6 +3,11 @@ import bcrypt from 'bcryptjs';
 import { initDbAsync } from '@/lib/db';
 import { generateTokens } from '@/lib/auth';
 
+// 전화번호 정규화: 하이픈 제거 후 다시 포맷
+function normalizePhone(phone: string): string {
+  return phone.replace(/[^0-9]/g, '');
+}
+
 export async function POST(request: Request) {
   try {
     const { phone, password } = await request.json();
@@ -11,11 +16,13 @@ export async function POST(request: Request) {
       return Response.json({ error: '연락처와 비밀번호를 입력해주세요' }, { status: 400 });
     }
 
+    const digits = normalizePhone(phone);
     const db = await initDbAsync();
 
+    // 하이픈 있는 형태와 없는 형태 모두 검색
     const user = db.prepare(
-      'SELECT id, name, phone, password_hash, department, role, profile_image, login_attempts, locked_until, is_active, is_approved FROM users WHERE phone = ?'
-    ).get(phone) as any;
+      'SELECT id, name, phone, password_hash, department, role, profile_image, login_attempts, locked_until, is_active, is_approved FROM users WHERE REPLACE(phone, \'-\', \'\') = ? OR phone = ?'
+    ).get(digits, phone) as any;
 
     if (!user) {
       return Response.json({ error: '연락처 또는 비밀번호가 올바르지 않습니다' }, { status: 401 });
@@ -25,8 +32,8 @@ export async function POST(request: Request) {
       return Response.json({ error: '비활성화된 계정입니다' }, { status: 403 });
     }
 
-    // Check approval
-    if (!user.is_approved) {
+    // ADMIN은 승인 체크 건너뜀, 일반 사용자만 승인 확인
+    if (user.role !== 'ADMIN' && !user.is_approved) {
       return Response.json({ error: '관리자 승인 대기 중입니다. 승인 후 로그인할 수 있습니다.' }, { status: 403 });
     }
 

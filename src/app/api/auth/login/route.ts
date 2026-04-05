@@ -13,9 +13,13 @@ export async function POST(request: Request) {
 
     const db = await initDbAsync();
 
-    const user = db.prepare(
-      'SELECT id, name, phone, password_hash, department, role, profile_image, login_attempts, locked_until, is_active, is_approved FROM users WHERE name = ?'
-    ).get(name.trim()) as any;
+    // sql.js에서 한글 파라미터 바인딩 이슈 우회: 전체 조회 후 필터
+    const allUsers = db.prepare(
+      'SELECT id, name, phone, password_hash, department, role, profile_image, login_attempts, locked_until, is_active, is_approved FROM users'
+    ).all() as any[];
+
+    const trimmedName = name.trim();
+    const user = allUsers.find((u: any) => u.name === trimmedName);
 
     if (!user) {
       return Response.json({ error: '이름 또는 비밀번호가 올바르지 않습니다' }, { status: 401 });

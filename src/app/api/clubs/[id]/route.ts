@@ -9,6 +9,7 @@ export async function GET(
   try {
     const { id } = await params;
     const db = await initDbAsync();
+    const user = getTokenFromRequest(request as NextRequest);
 
     const club = db.prepare(`
       SELECT c.*,
@@ -21,7 +22,19 @@ export async function GET(
       return Response.json({ error: '클럽을 찾을 수 없습니다' }, { status: 404 });
     }
 
-    return Response.json({ club });
+    let isMember = false;
+    if (user) {
+      if (user.role === 'ADMIN') {
+        isMember = true;
+      } else {
+        const membership = db.prepare(
+          'SELECT id FROM club_members WHERE club_id = ? AND user_id = ?'
+        ).get(id, user.userId);
+        isMember = !!membership;
+      }
+    }
+
+    return Response.json({ club, isMember });
   } catch (error) {
     console.error('Club detail error:', error);
     return Response.json({ error: '클럽 조회 중 오류가 발생했습니다' }, { status: 500 });

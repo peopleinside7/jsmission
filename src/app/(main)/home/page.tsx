@@ -52,9 +52,9 @@ export default function HomePage() {
   const [notices, setNotices] = useState<Array<{ id: number; title: string; created_at: string }>>([]);
 
   useEffect(() => {
-    fetch('/api/clubs').then(r => r.json()).then(d => setClubs(d.clubs || []));
-    fetch('/api/newcomers/dashboard').then(r => r.json()).then(d => setPipeline(d.pipeline || {}));
-    fetch('/api/boards/NOTICE').then(r => r.json()).then(d => setNotices((d.posts || []).slice(0, 3)));
+    fetch('/api/clubs').then(r => r.json()).then(d => setClubs(d.clubs || [])).catch(() => {});
+    fetch('/api/newcomers/dashboard').then(r => r.json()).then(d => setPipeline(d.pipeline || {})).catch(() => {});
+    fetch('/api/boards/NOTICE').then(r => r.json()).then(d => setNotices((d.posts || []).slice(0, 3))).catch(() => {});
   }, []);
 
   const totalNewcomers = Object.values(pipeline).reduce((s, v) => s + (v || 0), 0);

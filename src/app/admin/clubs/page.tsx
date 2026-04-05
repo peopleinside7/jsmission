@@ -9,13 +9,16 @@ export default function AdminClubsPage() {
   const [tab, setTab] = useState(0);
 
   useEffect(() => {
-    fetch('/api/clubs').then(r => r.json()).then(d => setClubs(d.clubs || []));
-    // Fetch all applications across clubs
-    Promise.all(
-      Array.from({ length: 8 }, (_, i) => fetch(`/api/clubs/${i + 1}/apply`).then(r => r.json()).catch(() => ({ applications: [] })))
-    ).then(results => {
-      setApplications(results.flatMap(r => r.applications || []));
-    });
+    fetch('/api/clubs').then(r => r.json()).then(d => {
+      const clubList = d.clubs || [];
+      setClubs(clubList);
+      // Fetch applications for all actual clubs
+      Promise.all(
+        clubList.map((c: any) => fetch(`/api/clubs/${c.id}/apply`).then(r => r.json()).catch(() => ({ applications: [] })))
+      ).then(results => {
+        setApplications(results.flatMap(r => r.applications || []));
+      });
+    }).catch(() => {});
   }, []);
 
   const handleApprove = async (appId: number) => {

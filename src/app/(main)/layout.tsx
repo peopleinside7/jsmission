@@ -1,32 +1,58 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import TabBar from '@/components/layout/TabBar';
 import Toast from '@/components/ui/Toast';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const pathname = usePathname();
-  const { user, setUser, isLoading } = useAuthStore();
+  const { setUser, isLoading } = useAuthStore();
   const [initialized, setInitialized] = useState(false);
 
-  useEffect(() => {
-    // Init DB
-    fetch('/api/init').then(() => {
-      // Check auth
-      fetch('/api/auth/me')
-        .then(res => res.ok ? res.json() : Promise.reject())
-        .then(data => {
+  const checkAuth = useCallback(async () => {
+    try {
+      const meRes = await fetch('/api/auth/me');
+      if (meRes.ok) {
+        const data = await meRes.json();
+        setUser(data.user);
+        return true;
+      }
+      // Try refresh token
+      const refreshRes = await fetch('/api/auth/refresh', { method: 'POST' });
+      if (refreshRes.ok) {
+        const meRes2 = await fetch('/api/auth/me');
+        if (meRes2.ok) {
+          const data = await meRes2.json();
           setUser(data.user);
-          setInitialized(true);
-        })
-        .catch(() => {
+          return true;
+        }
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }, [setUser]);
+
+  useEffect(() => {
+    fetch('/api/init')
+      .catch(() => {})
+      .finally(async () => {
+        const authed = await checkAuth();
+        if (!authed) {
           router.replace('/login');
-        });
-    });
-  }, []);
+        } else {
+          setInitialized(true);
+        }
+      });
+
+    // Auto refresh token every 25 minutes
+    const interval = setInterval(() => {
+      fetch('/api/auth/refresh', { method: 'POST' }).catch(() => {});
+    }, 25 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [checkAuth, router]);
 
   if (!initialized || isLoading) {
     return (

@@ -22,6 +22,8 @@ export async function GET(request: Request) {
       'SELECT COUNT(*) as count FROM clubs WHERE is_active = 1'
     ).get() as any;
 
+    const postCount = db.prepare('SELECT COUNT(*) as count FROM posts').get() as any;
+
     const newcomerPipeline = db.prepare(`
       SELECT
         COALESCE(SUM(CASE WHEN status = 'ATTEMPT' THEN 1 ELSE 0 END), 0) as ATTEMPT,
@@ -73,6 +75,7 @@ export async function GET(request: Request) {
     return Response.json({
       userCount: userCount.count,
       clubCount: clubCount.count,
+      postCount: postCount.count,
       newcomerPipeline,
       pendingApplications: pendingApplications.count,
       pendingUsers: pendingUsers.count,

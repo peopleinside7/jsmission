@@ -22,15 +22,31 @@ export async function GET(request: Request) {
       FROM newcomers
     `).get();
 
-    const recentNewcomers = db.prepare(`
-      SELECT n.*, c.name as club_name, c.icon as club_icon,
-        u.name as registered_by_name
-      FROM newcomers n
-      LEFT JOIN clubs c ON c.id = n.club_id
-      LEFT JOIN users u ON u.id = n.registered_by
-      ORDER BY n.created_at DESC
-      LIMIT 10
-    `).all();
+    // withList=true returns all newcomers (for prayer room, full list)
+    const url = new URL(request.url);
+    const withList = url.searchParams.get('withList') === 'true';
+
+    let newcomers;
+    if (withList) {
+      newcomers = db.prepare(`
+        SELECT n.*, c.name as club_name, c.icon as club_icon,
+          u.name as registered_by_name
+        FROM newcomers n
+        LEFT JOIN clubs c ON c.id = n.club_id
+        LEFT JOIN users u ON u.id = n.registered_by
+        ORDER BY n.created_at DESC
+      `).all();
+    } else {
+      newcomers = db.prepare(`
+        SELECT n.*, c.name as club_name, c.icon as club_icon,
+          u.name as registered_by_name
+        FROM newcomers n
+        LEFT JOIN clubs c ON c.id = n.club_id
+        LEFT JOIN users u ON u.id = n.registered_by
+        ORDER BY n.created_at DESC
+        LIMIT 10
+      `).all();
+    }
 
     const clubStats = db.prepare(`
       SELECT c.id, c.name, c.icon, c.icon_color,
@@ -43,7 +59,7 @@ export async function GET(request: Request) {
       ORDER BY total DESC
     `).all();
 
-    return Response.json({ pipeline, recentNewcomers, clubStats });
+    return Response.json({ pipeline, newcomers, recentNewcomers: newcomers, clubStats });
   } catch (error) {
     console.error('Newcomer dashboard error:', error);
     return Response.json({ error: '대시보드 조회 중 오류가 발생했습니다' }, { status: 500 });

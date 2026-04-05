@@ -1,11 +1,12 @@
 export interface User {
   id: number;
   name: string;
-  email: string;
-  phone?: string;
+  phone: string;
   department?: string;
+  referral_source?: string;
   role: 'USER' | 'CLUB_ADMIN' | 'ADMIN';
   profile_image?: string;
+  is_approved: boolean;
   is_active: boolean;
   created_at: string;
 }

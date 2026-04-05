@@ -5,7 +5,10 @@ import { generateTokens } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
-    const { name, password } = await request.json();
+    // Request body를 텍스트로 먼저 읽은 후 JSON 파싱 (한글 인코딩 보장)
+    const rawBody = await request.text();
+    const body = JSON.parse(rawBody);
+    const { name, password } = body;
 
     if (!name || !password) {
       return Response.json({ error: '이름과 비밀번호를 입력해주세요' }, { status: 400 });
@@ -13,7 +16,6 @@ export async function POST(request: Request) {
 
     const db = await initDbAsync();
 
-    // sql.js에서 한글 파라미터 바인딩 이슈 우회: 전체 조회 후 필터
     const allUsers = db.prepare(
       'SELECT id, name, phone, password_hash, department, role, profile_image, login_attempts, locked_until, is_active, is_approved FROM users'
     ).all() as any[];
@@ -22,14 +24,7 @@ export async function POST(request: Request) {
     const user = allUsers.find((u: any) => u.name === trimmedName);
 
     if (!user) {
-      // Debug: show available names
-      const names = allUsers.map((u: any) => u.name);
-      return Response.json({
-        error: '이름 또는 비밀번호가 올바르지 않습니다',
-        debug_count: allUsers.length,
-        debug_names: names,
-        debug_input: trimmedName,
-      }, { status: 401 });
+      return Response.json({ error: '이름 또는 비밀번호가 올바르지 않습니다' }, { status: 401 });
     }
 
     if (!user.is_active) {

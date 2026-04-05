@@ -18,6 +18,13 @@ export async function GET(
 
     const db = await initDbAsync();
 
+    if (user.role !== 'ADMIN') {
+      const isMember = db.prepare('SELECT id FROM club_members WHERE club_id = ? AND user_id = ?').get(id, user.userId);
+      if (!isMember) {
+        return Response.json({ error: '동아리 멤버만 조회할 수 있습니다' }, { status: 403 });
+      }
+    }
+
     let query = `
       SELECT n.*,
         u1.name as registered_by_name,
@@ -58,6 +65,15 @@ export async function POST(
     }
 
     const { id } = await params;
+    const db = await initDbAsync();
+
+    if (user.role !== 'ADMIN') {
+      const isMember = db.prepare('SELECT id FROM club_members WHERE club_id = ? AND user_id = ?').get(id, user.userId);
+      if (!isMember) {
+        return Response.json({ error: '동아리 멤버만 등록할 수 있습니다' }, { status: 403 });
+      }
+    }
+
     const body = await request.json();
     const {
       name, phone, age_group, gender, introduction,
@@ -67,8 +83,6 @@ export async function POST(
     if (!name) {
       return Response.json({ error: '이름은 필수입니다' }, { status: 400 });
     }
-
-    const db = await initDbAsync();
 
     const result = db.prepare(`
       INSERT INTO newcomers (club_id, registered_by, assigned_to, name, phone, age_group, gender,

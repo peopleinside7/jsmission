@@ -15,6 +15,13 @@ export async function GET(
     const { id } = await params;
     const db = await initDbAsync();
 
+    if (user.role !== 'ADMIN') {
+      const isMember = db.prepare('SELECT id FROM club_members WHERE club_id = ? AND user_id = ?').get(id, user.userId);
+      if (!isMember) {
+        return Response.json({ error: '동아리 멤버만 조회할 수 있습니다' }, { status: 403 });
+      }
+    }
+
     const sessions = db.prepare(`
       SELECT cs.*,
         (SELECT COUNT(*) FROM session_attendees sa WHERE sa.session_id = cs.id AND sa.status = 'ATTEND') as attend_count,

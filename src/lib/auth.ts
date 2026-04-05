@@ -2,7 +2,12 @@ import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import { NextRequest } from 'next/server';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'jsmission-secret-key-2026';
+const JWT_SECRET = process.env.JWT_SECRET || (() => {
+  if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+    console.warn('WARNING: JWT_SECRET not set. Using fallback for demo.');
+  }
+  return 'jsmission-secret-key-' + (process.env.VERCEL_URL || 'dev-local');
+})();
 const ACCESS_TOKEN_EXPIRY = '30m';
 const REFRESH_TOKEN_EXPIRY = '7d';
 

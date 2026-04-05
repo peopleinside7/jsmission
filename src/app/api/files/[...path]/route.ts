@@ -1,3 +1,5 @@
+import { NextRequest } from 'next/server';
+import { getTokenFromRequest } from '@/lib/auth';
 import path from 'path';
 import fs from 'fs';
 
@@ -9,7 +11,6 @@ const MIME_TYPES: Record<string, string> = {
   '.png': 'image/png',
   '.gif': 'image/gif',
   '.webp': 'image/webp',
-  '.svg': 'image/svg+xml',
   '.pdf': 'application/pdf',
   '.doc': 'application/msword',
   '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -29,6 +30,11 @@ export async function GET(
   { params }: { params: Promise<{ path: string[] }> }
 ) {
   try {
+    const user = getTokenFromRequest(request as NextRequest);
+    if (!user) {
+      return Response.json({ error: '로그인이 필요합니다' }, { status: 401 });
+    }
+
     const { path: pathSegments } = await params;
     const filePath = path.join(UPLOAD_DIR, ...pathSegments);
 
@@ -44,16 +50,21 @@ export async function GET(
 
     const ext = path.extname(resolvedPath).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-
     const fileBuffer = fs.readFileSync(resolvedPath);
 
-    return new Response(fileBuffer, {
-      headers: {
-        'Content-Type': contentType,
-        'Content-Length': fileBuffer.length.toString(),
-        'Cache-Control': 'public, max-age=86400',
-      },
-    });
+    const headers: Record<string, string> = {
+      'Content-Type': contentType,
+      'Content-Length': fileBuffer.length.toString(),
+      'Cache-Control': 'private, max-age=86400',
+      'X-Content-Type-Options': 'nosniff',
+    };
+
+    // Force download for SVG (XSS prevention) and other potentially dangerous types
+    if (ext === '.svg' || ext === '.html' || ext === '.htm') {
+      headers['Content-Disposition'] = `attachment; filename="${path.basename(resolvedPath)}"`;
+    }
+
+    return new Response(fileBuffer, { headers });
   } catch (error) {
     console.error('File serve error:', error);
     return Response.json({ error: '파일 조회 중 오류가 발생했습니다' }, { status: 500 });

@@ -6,7 +6,7 @@ import fs from 'fs';
 const UPLOAD_DIR = path.join(process.cwd(), 'data', 'uploads');
 const MAX_SIZE = 20 * 1024 * 1024; // 20MB
 const ALLOWED_EXTENSIONS = [
-  '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg',
+  '.jpg', '.jpeg', '.png', '.gif', '.webp',
   '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx',
   '.txt', '.csv', '.zip', '.hwp', '.hwpx',
 ];

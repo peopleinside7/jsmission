@@ -15,9 +15,19 @@ export async function GET(
     const { id } = await params;
     const db = await initDbAsync();
 
+    // Only club members or ADMIN can view member list
+    if (user.role !== 'ADMIN') {
+      const isMember = db.prepare(
+        'SELECT id FROM club_members WHERE club_id = ? AND user_id = ?'
+      ).get(id, user.userId);
+      if (!isMember) {
+        return Response.json({ error: '동아리 멤버만 조회할 수 있습니다' }, { status: 403 });
+      }
+    }
+
     const members = db.prepare(`
       SELECT cm.id, cm.club_id, cm.user_id, cm.role, cm.joined_at,
-        u.name as user_name, u.email as user_email, u.phone as user_phone,
+        u.name as user_name, u.phone as user_phone,
         u.department as user_department, u.profile_image
       FROM club_members cm
       JOIN users u ON u.id = cm.user_id

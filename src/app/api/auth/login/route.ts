@@ -22,7 +22,14 @@ export async function POST(request: Request) {
     const user = allUsers.find((u: any) => u.name === trimmedName);
 
     if (!user) {
-      return Response.json({ error: '이름 또는 비밀번호가 올바르지 않습니다' }, { status: 401 });
+      // Debug: show available names
+      const names = allUsers.map((u: any) => u.name);
+      return Response.json({
+        error: '이름 또는 비밀번호가 올바르지 않습니다',
+        debug_count: allUsers.length,
+        debug_names: names,
+        debug_input: trimmedName,
+      }, { status: 401 });
     }
 
     if (!user.is_active) {

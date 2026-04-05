@@ -3,36 +3,29 @@ import bcrypt from 'bcryptjs';
 import { initDbAsync } from '@/lib/db';
 import { generateTokens } from '@/lib/auth';
 
-// 전화번호 정규화: 하이픈 제거 후 다시 포맷
-function normalizePhone(phone: string): string {
-  return phone.replace(/[^0-9]/g, '');
-}
-
 export async function POST(request: Request) {
   try {
-    const { phone, password } = await request.json();
+    const { name, password } = await request.json();
 
-    if (!phone || !password) {
-      return Response.json({ error: '연락처와 비밀번호를 입력해주세요' }, { status: 400 });
+    if (!name || !password) {
+      return Response.json({ error: '이름과 비밀번호를 입력해주세요' }, { status: 400 });
     }
 
-    const digits = normalizePhone(phone);
     const db = await initDbAsync();
 
-    // 하이픈 있는 형태와 없는 형태 모두 검색
     const user = db.prepare(
-      'SELECT id, name, phone, password_hash, department, role, profile_image, login_attempts, locked_until, is_active, is_approved FROM users WHERE REPLACE(phone, \'-\', \'\') = ? OR phone = ?'
-    ).get(digits, phone) as any;
+      'SELECT id, name, phone, password_hash, department, role, profile_image, login_attempts, locked_until, is_active, is_approved FROM users WHERE name = ?'
+    ).get(name.trim()) as any;
 
     if (!user) {
-      return Response.json({ error: '연락처 또는 비밀번호가 올바르지 않습니다' }, { status: 401 });
+      return Response.json({ error: '이름 또는 비밀번호가 올바르지 않습니다' }, { status: 401 });
     }
 
     if (!user.is_active) {
       return Response.json({ error: '비활성화된 계정입니다' }, { status: 403 });
     }
 
-    // ADMIN은 승인 체크 건너뜀, 일반 사용자만 승인 확인
+    // ADMIN은 승인 체크 건너뜀
     if (user.role !== 'ADMIN' && !user.is_approved) {
       return Response.json({ error: '관리자 승인 대기 중입니다. 승인 후 로그인할 수 있습니다.' }, { status: 403 });
     }
@@ -53,17 +46,16 @@ export async function POST(request: Request) {
       const lockedUntil = attempts >= 5
         ? new Date(Date.now() + 15 * 60 * 1000).toISOString()
         : null;
-
       db.prepare('UPDATE users SET login_attempts = ?, locked_until = ? WHERE id = ?')
         .run(attempts, lockedUntil, user.id);
 
       return Response.json({
-        error: '연락처 또는 비밀번호가 올바르지 않습니다',
+        error: '이름 또는 비밀번호가 올바르지 않습니다',
         remainingAttempts: Math.max(0, 5 - attempts),
       }, { status: 401 });
     }
 
-    // Success - reset attempts
+    // Success
     db.prepare('UPDATE users SET login_attempts = 0, locked_until = NULL WHERE id = ?').run(user.id);
 
     const { accessToken, refreshToken } = generateTokens({

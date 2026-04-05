@@ -73,22 +73,33 @@ async function initDb(): Promise<DatabaseWrapper> {
     return new DatabaseWrapper(sqlDb);
   }
 
+  // Load WASM binary directly from file
+  let wasmBinary: Buffer | null = null;
+
+  // Try multiple locations for the WASM file
+  const possiblePaths = [
+    path.join(process.cwd(), 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm'),
+    path.join(process.cwd(), 'public', 'sql-wasm.wasm'),
+    path.join(process.cwd(), '.next', 'static', 'sql-wasm.wasm'),
+  ];
+
+  for (const p of possiblePaths) {
+    try {
+      if (fs.existsSync(p)) {
+        wasmBinary = fs.readFileSync(p);
+        break;
+      }
+    } catch { /* skip */ }
+  }
+
   let SQL;
-  if (IS_VERCEL) {
-    // In Vercel: fetch WASM from our own public directory
-    const wasmUrl = `${process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'https://jsmission.vercel.app'}/sql-wasm.wasm`;
-    const response = await fetch(wasmUrl);
-    const wasmBinary = await response.arrayBuffer();
-    SQL = await initSqlJs({ wasmBinary: new Uint8Array(wasmBinary) as any });
+  if (wasmBinary) {
+    SQL = await initSqlJs({ wasmBinary: wasmBinary as any });
   } else {
-    // Local: load from node_modules
-    const wasmPath = path.join(process.cwd(), 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm');
-    if (fs.existsSync(wasmPath)) {
-      const wasmBinary = fs.readFileSync(wasmPath);
-      SQL = await initSqlJs({ wasmBinary: wasmBinary as any });
-    } else {
-      SQL = await initSqlJs();
-    }
+    // Fallback: fetch from CDN
+    const response = await fetch('https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.wasm');
+    const buf = await response.arrayBuffer();
+    SQL = await initSqlJs({ wasmBinary: new Uint8Array(buf) as any });
   }
 
   // Try to load existing DB from file (local dev only)

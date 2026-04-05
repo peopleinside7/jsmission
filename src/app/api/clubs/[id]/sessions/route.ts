@@ -64,16 +64,12 @@ export async function POST(
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
-      const insertMany = db.transaction((items: any[]) => {
-        for (const s of items) {
-          insert.run(
-            id, s.session_no, s.topic || null, s.session_date || null,
-            s.start_time || null, s.end_time || null, s.location || null, s.notes || null
-          );
-        }
-      });
-
-      insertMany(sessions);
+      for (const s of sessions) {
+        insert.run(
+          id, s.session_no, s.topic || null, s.session_date || null,
+          s.start_time || null, s.end_time || null, s.location || null, s.notes || null
+        );
+      }
 
       return Response.json({ message: `${sessions.length}개 세션이 생성되었습니다` }, { status: 201 });
     }

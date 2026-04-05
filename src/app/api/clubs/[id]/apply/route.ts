@@ -83,8 +83,18 @@ export async function GET(
     const { id } = await params;
     const db = await initDbAsync();
 
+    // Only ADMIN or club ADMIN can view applications
+    if (user.role !== 'ADMIN') {
+      const isClubAdmin = db.prepare(
+        "SELECT id FROM club_members WHERE club_id = ? AND user_id = ? AND role = 'ADMIN'"
+      ).get(id, user.userId);
+      if (!isClubAdmin) {
+        return Response.json({ error: '권한이 없습니다' }, { status: 403 });
+      }
+    }
+
     const applications = db.prepare(`
-      SELECT ca.*, u.name as user_name, u.email as user_email
+      SELECT ca.*, u.name as user_name, u.phone as user_phone, u.department as user_department
       FROM club_applications ca
       JOIN users u ON u.id = ca.user_id
       WHERE ca.club_id = ?

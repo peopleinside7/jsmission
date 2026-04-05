@@ -2,6 +2,14 @@ import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
 import { initDbAsync } from '@/lib/db';
 
+function canAccessNewcomer(db: any, newcomer: any, userId: number, userRole: string): boolean {
+  if (userRole === 'ADMIN') return true;
+  const member = db.prepare(
+    'SELECT id FROM club_members WHERE club_id = ? AND user_id = ?'
+  ).get(newcomer.club_id, userId);
+  return !!member;
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -31,6 +39,10 @@ export async function GET(
       return Response.json({ error: '새신자를 찾을 수 없습니다' }, { status: 404 });
     }
 
+    if (!canAccessNewcomer(db, newcomer, user.userId, user.role)) {
+      return Response.json({ error: '해당 동아리 멤버만 접근할 수 있습니다' }, { status: 403 });
+    }
+
     return Response.json({ newcomer });
   } catch (error) {
     console.error('Newcomer detail error:', error);
@@ -51,6 +63,15 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
     const db = await initDbAsync();
+
+    const existing = db.prepare('SELECT * FROM newcomers WHERE id = ?').get(id);
+    if (!existing) {
+      return Response.json({ error: '새신자를 찾을 수 없습니다' }, { status: 404 });
+    }
+
+    if (!canAccessNewcomer(db, existing, user.userId, user.role)) {
+      return Response.json({ error: '해당 동아리 멤버만 수정할 수 있습니다' }, { status: 403 });
+    }
 
     const fields: string[] = [];
     const values: any[] = [];

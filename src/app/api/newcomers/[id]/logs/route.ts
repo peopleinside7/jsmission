@@ -2,6 +2,16 @@ import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
 import { initDbAsync } from '@/lib/db';
 
+function checkNewcomerAccess(db: any, newcomerId: string, userId: number, userRole: string): boolean {
+  if (userRole === 'ADMIN') return true;
+  const newcomer = db.prepare('SELECT club_id FROM newcomers WHERE id = ?').get(newcomerId);
+  if (!newcomer) return false;
+  const member = db.prepare(
+    'SELECT id FROM club_members WHERE club_id = ? AND user_id = ?'
+  ).get(newcomer.club_id, userId);
+  return !!member;
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -14,6 +24,10 @@ export async function GET(
 
     const { id } = await params;
     const db = await initDbAsync();
+
+    if (!checkNewcomerAccess(db, id, user.userId, user.role)) {
+      return Response.json({ error: '권한이 없습니다' }, { status: 403 });
+    }
 
     const logs = db.prepare(`
       SELECT al.*, u.name as author_name
@@ -47,13 +61,21 @@ export async function POST(
       return Response.json({ error: '내용과 활동 유형은 필수입니다' }, { status: 400 });
     }
 
+    const validTypes = ['ATTEMPT', 'PRELIM', 'GOSPEL', 'WORSHIP', 'COMPLETE'];
+    if (!validTypes.includes(activity_type)) {
+      return Response.json({ error: '올바르지 않은 활동 유형입니다' }, { status: 400 });
+    }
+
     const db = await initDbAsync();
+
+    if (!checkNewcomerAccess(db, id, user.userId, user.role)) {
+      return Response.json({ error: '권한이 없습니다' }, { status: 403 });
+    }
 
     const result = db.prepare(
       'INSERT INTO activity_logs (newcomer_id, author_id, content, activity_type) VALUES (?, ?, ?, ?)'
     ).run(id, user.userId, content, activity_type);
 
-    // Update newcomer's last_contact_date and status
     db.prepare(
       "UPDATE newcomers SET last_contact_date = date('now'), status = ?, updated_at = datetime('now') WHERE id = ?"
     ).run(activity_type, id);

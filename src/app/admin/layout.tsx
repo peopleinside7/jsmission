@@ -84,7 +84,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-sm">{user?.name[0]}</div>
             <div>
               <p className="text-sm font-medium">{user?.name}</p>
-              <p className="text-xs text-white/60">{user?.email}</p>
+              <p className="text-xs text-white/60">{user?.phone}</p>
             </div>
           </div>
           <button onClick={handleLogout} className="flex items-center gap-2 text-sm text-white/70 hover:text-white">

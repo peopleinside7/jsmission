@@ -3,7 +3,7 @@ import { create } from 'zustand';
 
 interface AuthUser {
   userId: number;
-  email: string;
+  phone: string;
   role: string;
   name: string;
 }

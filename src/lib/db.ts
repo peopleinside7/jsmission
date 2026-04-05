@@ -20,28 +20,38 @@ class DatabaseWrapper {
     const db = this.db;
     return {
       run(...params: any[]) {
-        db.run(sql, params);
+        const stmt = db.prepare(sql);
+        try {
+          if (params.length > 0) stmt.bind(params);
+          stmt.step();
+        } finally {
+          stmt.free();
+        }
         return { changes: db.getRowsModified(), lastInsertRowid: getLastInsertRowId(db) };
       },
       get(...params: any[]) {
         const stmt = db.prepare(sql);
-        if (params.length > 0) stmt.bind(params);
-        if (stmt.step()) {
-          const row = stmt.getAsObject();
+        try {
+          if (params.length > 0) stmt.bind(params);
+          if (stmt.step()) {
+            return stmt.getAsObject();
+          }
+          return undefined;
+        } finally {
           stmt.free();
-          return row;
         }
-        stmt.free();
-        return undefined;
       },
       all(...params: any[]) {
         const results: any[] = [];
         const stmt = db.prepare(sql);
-        if (params.length > 0) stmt.bind(params);
-        while (stmt.step()) {
-          results.push(stmt.getAsObject());
+        try {
+          if (params.length > 0) stmt.bind(params);
+          while (stmt.step()) {
+            results.push(stmt.getAsObject());
+          }
+        } finally {
+          stmt.free();
         }
-        stmt.free();
         return results;
       },
     };
@@ -412,19 +422,9 @@ function saveToFile() {
   }
 }
 
-// Synchronous-looking wrapper using a cached promise
 let dbPromise: Promise<DatabaseWrapper> | null = null;
 
-export default function getDb(): any {
-  // For compatibility: if DB is already initialized, return wrapper synchronously
-  if (sqlDb && initialized) {
-    return new DatabaseWrapper(sqlDb);
-  }
-  // This shouldn't happen after first init, but fallback
-  throw new Error('DB not initialized. Call initDbAsync() first.');
-}
-
-export async function initDbAsync(): Promise<any> {
+export async function initDbAsync(): Promise<DatabaseWrapper> {
   if (sqlDb && initialized) {
     return new DatabaseWrapper(sqlDb);
   }
@@ -434,4 +434,5 @@ export async function initDbAsync(): Promise<any> {
   return dbPromise;
 }
 
+export default initDbAsync;
 export { saveToFile };

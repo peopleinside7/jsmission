@@ -73,9 +73,23 @@ async function initDb(): Promise<DatabaseWrapper> {
     return new DatabaseWrapper(sqlDb);
   }
 
-  const SQL = await initSqlJs({
-    locateFile: (file: string) => `https://sql.js.org/dist/${file}`
-  });
+  let SQL;
+  if (IS_VERCEL) {
+    // In Vercel: fetch WASM from our own public directory
+    const wasmUrl = `${process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'https://jsmission.vercel.app'}/sql-wasm.wasm`;
+    const response = await fetch(wasmUrl);
+    const wasmBinary = await response.arrayBuffer();
+    SQL = await initSqlJs({ wasmBinary: new Uint8Array(wasmBinary) as any });
+  } else {
+    // Local: load from node_modules
+    const wasmPath = path.join(process.cwd(), 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm');
+    if (fs.existsSync(wasmPath)) {
+      const wasmBinary = fs.readFileSync(wasmPath);
+      SQL = await initSqlJs({ wasmBinary: wasmBinary as any });
+    } else {
+      SQL = await initSqlJs();
+    }
+  }
 
   // Try to load existing DB from file (local dev only)
   if (!IS_VERCEL) {

@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import getDb from '@/lib/db';
+import { initDbAsync } from '@/lib/db';
 
 export async function GET(
   request: Request,
@@ -25,7 +25,7 @@ export async function GET(
     const limit = parseInt(url.searchParams.get('limit') || '20');
     const offset = (page - 1) * limit;
 
-    const db = getDb();
+    const db = await initDbAsync();
 
     let whereClause = 'WHERE p.board_type = ?';
     const queryParams: any[] = [boardType];
@@ -89,7 +89,7 @@ export async function POST(
       return Response.json({ error: '제목은 필수입니다' }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await initDbAsync();
 
     const result = db.prepare(`
       INSERT INTO posts (board_type, club_id, author_id, title, content, file_path, file_name, resource_category)

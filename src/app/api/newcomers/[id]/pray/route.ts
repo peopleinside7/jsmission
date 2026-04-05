@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import getDb from '@/lib/db';
+import { initDbAsync } from '@/lib/db';
 
 export async function POST(
   request: Request,
@@ -15,7 +15,7 @@ export async function POST(
     const { id } = await params;
     const { content } = await request.json();
 
-    const db = getDb();
+    const db = await initDbAsync();
 
     const result = db.prepare(
       'INSERT INTO prayers (newcomer_id, user_id, content) VALUES (?, ?, ?)'

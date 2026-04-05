@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import getDb from '@/lib/db';
+import { initDbAsync } from '@/lib/db';
 
 export async function GET(request: Request) {
   try {
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
     const limit = parseInt(url.searchParams.get('limit') || '20');
     const offset = (page - 1) * limit;
 
-    const db = getDb();
+    const db = await initDbAsync();
 
     let whereClause = '';
     const queryParams: any[] = [];
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
       return Response.json({ error: '유형과 내용은 필수입니다' }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await initDbAsync();
 
     const result = db.prepare(`
       INSERT INTO mission_logs (user_id, log_type, appointment_id, content, location, result_summary, attempt_count, images)

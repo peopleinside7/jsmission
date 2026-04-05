@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import getDb from '@/lib/db';
+import { initDbAsync } from '@/lib/db';
 
 export async function GET(
   request: Request,
@@ -11,7 +11,7 @@ export async function GET(
     const user = getTokenFromRequest(request as NextRequest);
     const userId = user?.userId || 0;
 
-    const db = getDb();
+    const db = await initDbAsync();
 
     const allComments = db.prepare(`
       SELECT c.*, u.name as author_name,
@@ -65,7 +65,7 @@ export async function POST(
       return Response.json({ error: '댓글 내용을 입력해주세요' }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await initDbAsync();
 
     // Verify post exists
     const post = db.prepare('SELECT id FROM posts WHERE id = ?').get(id);

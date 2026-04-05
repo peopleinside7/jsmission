@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import getDb from '@/lib/db';
+import { initDbAsync } from '@/lib/db';
 
 export async function GET(request: Request) {
   try {
@@ -9,9 +9,9 @@ export async function GET(request: Request) {
       return Response.json({ error: '로그인이 필요합니다' }, { status: 401 });
     }
 
-    const db = getDb();
+    const db = await initDbAsync();
     const userData = db.prepare(
-      'SELECT id, name, email, phone, department, role, profile_image, is_active, created_at FROM users WHERE id = ?'
+      'SELECT id, name, phone, department, role, profile_image, referral_source, is_approved, is_active, created_at FROM users WHERE id = ?'
     ).get(user.userId) as any;
 
     if (!userData) {

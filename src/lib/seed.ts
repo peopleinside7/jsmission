@@ -1,36 +1,33 @@
-import getDb from './db';
 import bcryptjs from 'bcryptjs';
 
-export function seedDatabase() {
-  const db = getDb();
-
+export function seedDatabase(db: any) {
   // Check if already seeded
-  const adminExists = db.prepare('SELECT id FROM users WHERE email = ?').get('admin@jsmission.kr');
+  const adminExists = db.prepare('SELECT id FROM users WHERE phone = ?').get('010-0000-0000');
   if (adminExists) return;
 
   console.log('🌱 Seeding database...');
 
-  // Admin user
+  // Admin user (auto-approved)
   const adminHash = bcryptjs.hashSync('admin1234', 10);
   db.prepare(`
-    INSERT INTO users (name, email, password_hash, role, department)
-    VALUES (?, ?, ?, 'ADMIN', '관리부')
-  `).run('관리자', 'admin@jsmission.kr', adminHash);
+    INSERT INTO users (name, phone, password_hash, role, department, is_approved, referral_source)
+    VALUES (?, ?, ?, 'ADMIN', '관리부', 1, '시스템관리자')
+  `).run('관리자', '010-0000-0000', adminHash);
 
-  // Demo users
+  // Demo users (approved)
   const demoHash = bcryptjs.hashSync('test1234', 10);
   const demoUsers = [
-    { name: '김성도', email: 'user1@test.com', dept: '청년부' },
-    { name: '이은혜', email: 'user2@test.com', dept: '대학부' },
-    { name: '박믿음', email: 'user3@test.com', dept: '청년부' },
-    { name: '최소망', email: 'user4@test.com', dept: '대학부' },
-    { name: '정사랑', email: 'user5@test.com', dept: '청년부' },
+    { name: '김성도', phone: '010-1111-1111', dept: '청년부', ref: '교회 소개' },
+    { name: '이은혜', phone: '010-2222-2222', dept: '대학부', ref: '지인 소개' },
+    { name: '박믿음', phone: '010-3333-3333', dept: '청년부', ref: '인스타그램' },
+    { name: '최소망', phone: '010-4444-4444', dept: '대학부', ref: '교회 홈페이지' },
+    { name: '정사랑', phone: '010-5555-5555', dept: '청년부', ref: '전단지' },
   ];
   const insertUser = db.prepare(`
-    INSERT INTO users (name, email, password_hash, department) VALUES (?, ?, ?, ?)
+    INSERT INTO users (name, phone, password_hash, department, is_approved, referral_source) VALUES (?, ?, ?, ?, 1, ?)
   `);
   for (const u of demoUsers) {
-    insertUser.run(u.name, u.email, demoHash, u.dept);
+    insertUser.run(u.name, u.phone, demoHash, u.dept, u.ref);
   }
 
   // 8 Clubs
@@ -131,11 +128,11 @@ export function seedDatabase() {
 
   // Add some club members (demo users join clubs)
   const insertMember = db.prepare(`INSERT INTO club_members (club_id, user_id, role) VALUES (?, ?, ?)`);
-  insertMember.run(1, 2, 'ADMIN'); // 김성도 → 오물오물 ADMIN
+  insertMember.run(1, 2, 'ADMIN');
   insertMember.run(1, 3, 'MEMBER');
-  insertMember.run(2, 4, 'ADMIN'); // 최소망 → 일본어 ADMIN
-  insertMember.run(3, 5, 'ADMIN'); // 박믿음 → POWER FC ADMIN
-  insertMember.run(4, 6, 'ADMIN'); // 정사랑 → 러닝크루 ADMIN
+  insertMember.run(2, 4, 'ADMIN');
+  insertMember.run(3, 5, 'ADMIN');
+  insertMember.run(4, 6, 'ADMIN');
 
   // Demo newcomers
   const insertNewcomer = db.prepare(`

@@ -1,10 +1,10 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import getDb from '@/lib/db';
+import { initDbAsync } from '@/lib/db';
 
 export async function GET() {
   try {
-    const db = getDb();
+    const db = await initDbAsync();
     const clubs = db.prepare(`
       SELECT c.*,
         (SELECT COUNT(*) FROM club_members WHERE club_id = c.id) as member_count,
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
       return Response.json({ error: '클럽 이름은 필수입니다' }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await initDbAsync();
     const result = db.prepare(`
       INSERT INTO clubs (name, icon, icon_color, slogan, description, category,
         poster_image, target_age, target_gender, max_members,

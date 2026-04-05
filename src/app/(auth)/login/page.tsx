@@ -9,29 +9,47 @@ export default function LoginPage() {
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [form, setForm] = useState({
-    email: '', password: '', name: '', phone: '', department: ''
+    phone: '', password: '', name: '', department: '', referral_source: ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
 
     try {
-      const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
-      const body = isRegister ? form : { email: form.email, password: form.password };
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || '오류가 발생했습니다');
-        return;
+      if (isRegister) {
+        // 회원가입
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.error || '오류가 발생했습니다');
+          return;
+        }
+        setSuccess('회원가입 신청이 완료되었습니다!\n관리자 승인 후 로그인할 수 있습니다.');
+        setIsRegister(false);
+        setForm({ ...form, name: '', department: '', referral_source: '' });
+      } else {
+        // 로그인
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: form.phone, password: form.password }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.error || '오류가 발생했습니다');
+          return;
+        }
+        router.push('/home');
       }
-      router.push('/home');
     } catch {
       setError('서버 연결에 실패했습니다');
     } finally {
@@ -51,6 +69,13 @@ export default function LoginPage() {
           <p className="text-sm text-[#666] mt-1">안산주성령교회 문화선교</p>
         </div>
 
+        {/* Success */}
+        {success && (
+          <div className="mb-4 p-4 bg-[#E8F5E9] border border-[#4CAF50] rounded-lg text-sm text-[#1E5631] whitespace-pre-line">
+            {success}
+          </div>
+        )}
+
         {/* Error */}
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-[#E53935]">
@@ -63,23 +88,13 @@ export default function LoginPage() {
           {isRegister && (
             <>
               <div>
-                <label className="text-sm font-medium text-[#333] mb-1.5 block">이름</label>
+                <label className="text-sm font-medium text-[#333] mb-1.5 block">이름 *</label>
                 <input
                   type="text" required
                   className="input-field"
                   placeholder="이름을 입력하세요"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-[#333] mb-1.5 block">연락처</label>
-                <input
-                  type="tel"
-                  className="input-field"
-                  placeholder="010-0000-0000"
-                  value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 />
               </div>
               <div>
@@ -92,24 +107,34 @@ export default function LoginPage() {
                   onChange={(e) => setForm({ ...form, department: e.target.value })}
                 />
               </div>
+              <div>
+                <label className="text-sm font-medium text-[#333] mb-1.5 block">가입경로</label>
+                <input
+                  type="text"
+                  className="input-field"
+                  placeholder="예: 교회 소개, 지인 추천, 인스타그램"
+                  value={form.referral_source}
+                  onChange={(e) => setForm({ ...form, referral_source: e.target.value })}
+                />
+              </div>
             </>
           )}
 
           <div>
-            <label className="text-sm font-medium text-[#333] mb-1.5 block">이메일</label>
+            <label className="text-sm font-medium text-[#333] mb-1.5 block">연락처 *</label>
             <input
-              type="email" required
+              type="tel" required
               className="input-field"
-              placeholder="이메일을 입력하세요"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              placeholder="010-0000-0000"
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
             />
           </div>
 
           <div>
-            <label className="text-sm font-medium text-[#333] mb-1.5 block">비밀번호</label>
+            <label className="text-sm font-medium text-[#333] mb-1.5 block">비밀번호 *</label>
             <input
-              type="password" required minLength={6}
+              type="password" required minLength={4}
               className="input-field"
               placeholder="비밀번호를 입력하세요"
               value={form.password}
@@ -118,25 +143,33 @@ export default function LoginPage() {
           </div>
 
           <button type="submit" disabled={loading} className="btn-primary w-full mt-6">
-            {loading ? '처리 중...' : isRegister ? '회원가입' : '로그인'}
+            {loading ? '처리 중...' : isRegister ? '가입 신청' : '로그인'}
           </button>
         </form>
 
         {/* Toggle */}
         <div className="text-center mt-6">
           <button
-            onClick={() => { setIsRegister(!isRegister); setError(''); }}
+            onClick={() => { setIsRegister(!isRegister); setError(''); setSuccess(''); }}
             className="text-sm text-[#666] hover:text-[#1E5631]"
           >
-            {isRegister ? '이미 계정이 있으신가요? 로그인' : '계정이 없으신가요? 회원가입'}
+            {isRegister ? '이미 계정이 있으신가요? 로그인' : '계정이 없으신가요? 가입 신청'}
           </button>
         </div>
+
+        {isRegister && (
+          <div className="mt-4 p-3 bg-[#F1F8E9] rounded-xl">
+            <p className="text-xs text-[#666] text-center">
+              가입 신청 후 관리자 승인이 완료되면 로그인할 수 있습니다
+            </p>
+          </div>
+        )}
 
         {/* Demo accounts info */}
         <div className="mt-8 p-4 bg-[#F7F7F7] rounded-xl">
           <p className="text-xs text-[#999] text-center mb-2">테스트 계정</p>
-          <p className="text-xs text-[#666] text-center">Admin: admin@jsmission.kr / admin1234</p>
-          <p className="text-xs text-[#666] text-center">User: user1@test.com / test1234</p>
+          <p className="text-xs text-[#666] text-center">Admin: 010-0000-0000 / admin1234</p>
+          <p className="text-xs text-[#666] text-center">User: 010-1111-1111 / test1234</p>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import getDb from '@/lib/db';
+import { initDbAsync } from '@/lib/db';
 
 export async function PUT(
   request: Request,
@@ -19,7 +19,7 @@ export async function PUT(
       return Response.json({ error: '유효하지 않은 상태입니다' }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await initDbAsync();
 
     const application = db.prepare(`
       SELECT ca.*, c.name as club_name

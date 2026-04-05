@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import getDb from '@/lib/db';
+import { initDbAsync } from '@/lib/db';
 
 export async function GET(request: Request) {
   try {
@@ -9,7 +9,7 @@ export async function GET(request: Request) {
       return Response.json({ error: '로그인이 필요합니다' }, { status: 401 });
     }
 
-    const db = getDb();
+    const db = await initDbAsync();
 
     const appointments = db.prepare(`
       SELECT ma.*, u.name as creator_name
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
       return Response.json({ error: '유형과 제목은 필수입니다' }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await initDbAsync();
 
     const result = db.prepare(`
       INSERT INTO mission_appointments (appointment_type, title, description, appointment_date, start_time, location, created_by, participants)

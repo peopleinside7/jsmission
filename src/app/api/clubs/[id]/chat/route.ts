@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import getDb from '@/lib/db';
+import { initDbAsync } from '@/lib/db';
 
 export async function GET(
   request: Request,
@@ -13,7 +13,7 @@ export async function GET(
     }
 
     const { id } = await params;
-    const db = getDb();
+    const db = await initDbAsync();
 
     const messages = db.prepare(`
       SELECT cm.*, u.name as user_name, u.profile_image
@@ -48,7 +48,7 @@ export async function POST(
       return Response.json({ error: '메시지 내용을 입력해주세요' }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await initDbAsync();
 
     const result = db.prepare(
       'INSERT INTO chat_messages (club_id, user_id, content, image_path) VALUES (?, ?, ?, ?)'

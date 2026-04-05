@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import getDb from '@/lib/db';
+import { initDbAsync } from '@/lib/db';
 
 export async function GET(
   request: Request,
@@ -13,7 +13,7 @@ export async function GET(
     }
 
     const { id } = await params;
-    const db = getDb();
+    const db = await initDbAsync();
 
     const logs = db.prepare(`
       SELECT al.*, u.name as author_name
@@ -47,7 +47,7 @@ export async function POST(
       return Response.json({ error: '내용과 활동 유형은 필수입니다' }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await initDbAsync();
 
     const result = db.prepare(
       'INSERT INTO activity_logs (newcomer_id, author_id, content, activity_type) VALUES (?, ?, ?, ?)'

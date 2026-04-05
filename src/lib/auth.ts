@@ -8,7 +8,7 @@ const REFRESH_TOKEN_EXPIRY = '7d';
 
 export interface TokenPayload {
   userId: number;
-  email: string;
+  phone: string;
   role: string;
   name: string;
 }

@@ -77,7 +77,7 @@ export default function MyPage() {
           </div>
           <div className="flex-1">
             <p className="text-base font-bold text-[#1A1A1A]">{user?.name}</p>
-            <p className="text-xs text-[#999]">{user?.email}</p>
+            <p className="text-xs text-[#999]">{(user as any)?.phone}</p>
             <p className="text-xs text-[#4CAF50] mt-0.5">{user?.role === 'ADMIN' ? '관리자' : user?.role === 'CLUB_ADMIN' ? '동아리 관리자' : '일반 회원'}</p>
           </div>
           <Link href="/settings"><Settings className="w-5 h-5 text-[#999]" /></Link>

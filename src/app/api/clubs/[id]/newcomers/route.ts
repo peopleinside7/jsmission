@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import getDb from '@/lib/db';
+import { initDbAsync } from '@/lib/db';
 
 export async function GET(
   request: Request,
@@ -16,7 +16,7 @@ export async function GET(
     const url = new URL(request.url);
     const status = url.searchParams.get('status');
 
-    const db = getDb();
+    const db = await initDbAsync();
 
     let query = `
       SELECT n.*,
@@ -68,7 +68,7 @@ export async function POST(
       return Response.json({ error: '이름은 필수입니다' }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await initDbAsync();
 
     const result = db.prepare(`
       INSERT INTO newcomers (club_id, registered_by, assigned_to, name, phone, age_group, gender,

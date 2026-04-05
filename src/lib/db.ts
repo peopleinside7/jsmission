@@ -1,44 +1,138 @@
-import Database from 'better-sqlite3';
+import initSqlJs, { Database as SqlJsDatabase } from 'sql.js';
 import path from 'path';
 import fs from 'fs';
 
+const IS_VERCEL = !!process.env.VERCEL;
 const DB_PATH = path.join(process.cwd(), 'data', 'jsmission.db');
 
-// Ensure data directory exists
-const dataDir = path.dirname(DB_PATH);
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
+let sqlDb: SqlJsDatabase | null = null;
+let initialized = false;
 
-let db: Database.Database;
+// Wrapper that mimics better-sqlite3 API
+class DatabaseWrapper {
+  private db: SqlJsDatabase;
 
-function getDb(): Database.Database {
-  if (!db) {
-    db = new Database(DB_PATH);
-    db.pragma('journal_mode = WAL');
-    db.pragma('foreign_keys = ON');
-    initializeSchema();
+  constructor(db: SqlJsDatabase) {
+    this.db = db;
   }
-  return db;
+
+  prepare(sql: string) {
+    const db = this.db;
+    return {
+      run(...params: any[]) {
+        db.run(sql, params);
+        return { changes: db.getRowsModified(), lastInsertRowid: getLastInsertRowId(db) };
+      },
+      get(...params: any[]) {
+        const stmt = db.prepare(sql);
+        if (params.length > 0) stmt.bind(params);
+        if (stmt.step()) {
+          const row = stmt.getAsObject();
+          stmt.free();
+          return row;
+        }
+        stmt.free();
+        return undefined;
+      },
+      all(...params: any[]) {
+        const results: any[] = [];
+        const stmt = db.prepare(sql);
+        if (params.length > 0) stmt.bind(params);
+        while (stmt.step()) {
+          results.push(stmt.getAsObject());
+        }
+        stmt.free();
+        return results;
+      },
+    };
+  }
+
+  exec(sql: string) {
+    this.db.exec(sql);
+  }
+
+  pragma(pragma: string) {
+    try {
+      this.db.exec(`PRAGMA ${pragma}`);
+    } catch {
+      // Ignore pragma errors
+    }
+  }
 }
 
-function initializeSchema() {
-  const d = db;
+function getLastInsertRowId(db: SqlJsDatabase): number {
+  const stmt = db.prepare('SELECT last_insert_rowid() as id');
+  stmt.step();
+  const result = stmt.getAsObject() as any;
+  stmt.free();
+  return result.id;
+}
 
-  d.exec(`
+async function initDb(): Promise<DatabaseWrapper> {
+  if (sqlDb && initialized) {
+    return new DatabaseWrapper(sqlDb);
+  }
+
+  const SQL = await initSqlJs();
+
+  // Try to load existing DB from file (local dev only)
+  if (!IS_VERCEL) {
+    try {
+      const dataDir = path.dirname(DB_PATH);
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+      }
+      if (fs.existsSync(DB_PATH)) {
+        const buffer = fs.readFileSync(DB_PATH);
+        sqlDb = new SQL.Database(buffer);
+        initialized = true;
+        const wrapper = new DatabaseWrapper(sqlDb);
+        wrapper.pragma('foreign_keys = ON');
+        return wrapper;
+      }
+    } catch {
+      // Fall through to create new DB
+    }
+  }
+
+  // Create new in-memory DB
+  sqlDb = new SQL.Database();
+  initialized = true;
+  const wrapper = new DatabaseWrapper(sqlDb);
+  wrapper.pragma('foreign_keys = ON');
+  initializeSchema(wrapper);
+
+  // Run seed
+  const { seedDatabase } = await import('./seed');
+  seedDatabase(wrapper);
+
+  // Save to file (local dev only)
+  if (!IS_VERCEL) {
+    saveToFile();
+  }
+
+  return wrapper;
+}
+
+function initializeSchema(db: DatabaseWrapper) {
+  db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name VARCHAR(50) NOT NULL,
-      email VARCHAR(100) UNIQUE NOT NULL,
+      phone VARCHAR(20) NOT NULL,
       password_hash VARCHAR(255) NOT NULL,
-      phone VARCHAR(20),
       department VARCHAR(50),
-      role TEXT CHECK(role IN ('USER','CLUB_ADMIN','ADMIN')) DEFAULT 'USER',
+      referral_source VARCHAR(200),
+      role TEXT DEFAULT 'USER',
       profile_image VARCHAR(500),
+      is_approved BOOLEAN DEFAULT 0,
+      approved_by INTEGER,
+      approved_at DATETIME,
       login_attempts INTEGER DEFAULT 0,
       locked_until DATETIME,
       is_active BOOLEAN DEFAULT 1,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(phone)
     );
 
     CREATE TABLE IF NOT EXISTS clubs (
@@ -48,7 +142,7 @@ function initializeSchema() {
       icon_color VARCHAR(10),
       slogan VARCHAR(200),
       description TEXT,
-      category TEXT CHECK(category IN ('교육','스포츠','문화','대학사역','찬양','기타')),
+      category TEXT,
       poster_image VARCHAR(500),
       target_age VARCHAR(100),
       target_gender VARCHAR(20),
@@ -60,8 +154,8 @@ function initializeSchema() {
       curriculum JSON,
       total_sessions INTEGER,
       external_link VARCHAR(500),
-      recruitment_status TEXT CHECK(recruitment_status IN ('OPEN','CLOSED')) DEFAULT 'OPEN',
-      approval_mode TEXT CHECK(approval_mode IN ('CLUB_ADMIN','AUTO')) DEFAULT 'CLUB_ADMIN',
+      recruitment_status TEXT DEFAULT 'OPEN',
+      approval_mode TEXT DEFAULT 'CLUB_ADMIN',
       display_order INTEGER DEFAULT 0,
       is_active BOOLEAN DEFAULT 1,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -71,7 +165,7 @@ function initializeSchema() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       club_id INTEGER NOT NULL,
       user_id INTEGER NOT NULL,
-      role TEXT CHECK(role IN ('MEMBER','ADMIN')) DEFAULT 'MEMBER',
+      role TEXT DEFAULT 'MEMBER',
       joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (club_id) REFERENCES clubs(id) ON DELETE CASCADE,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -85,8 +179,8 @@ function initializeSchema() {
       department VARCHAR(50),
       phone VARCHAR(20),
       purpose TEXT,
-      target_type TEXT CHECK(target_type IN ('FRIEND','COLLEAGUE','NEW_CONTACT','OTHER')),
-      status TEXT CHECK(status IN ('PENDING','APPROVED','REJECTED')) DEFAULT 'PENDING',
+      target_type TEXT,
+      status TEXT DEFAULT 'PENDING',
       reviewed_by INTEGER,
       reviewed_at DATETIME,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -112,7 +206,7 @@ function initializeSchema() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       session_id INTEGER NOT NULL,
       user_id INTEGER NOT NULL,
-      status TEXT CHECK(status IN ('ATTEND','ABSENT','PENDING')) DEFAULT 'PENDING',
+      status TEXT DEFAULT 'PENDING',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (session_id) REFERENCES club_sessions(id) ON DELETE CASCADE,
       FOREIGN KEY (user_id) REFERENCES users(id),
@@ -130,7 +224,7 @@ function initializeSchema() {
       gender VARCHAR(10),
       introduction TEXT,
       how_met TEXT,
-      status TEXT CHECK(status IN ('ATTEMPT','PRELIM','GOSPEL','WORSHIP','COMPLETE','LOST')) DEFAULT 'ATTEMPT',
+      status TEXT DEFAULT 'ATTEMPT',
       prayer_request TEXT,
       last_contact_date DATE,
       notes TEXT,
@@ -146,7 +240,7 @@ function initializeSchema() {
       newcomer_id INTEGER NOT NULL,
       author_id INTEGER NOT NULL,
       content TEXT NOT NULL,
-      activity_type TEXT CHECK(activity_type IN ('ATTEMPT','PRELIM','GOSPEL','WORSHIP','COMPLETE')) NOT NULL,
+      activity_type TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (newcomer_id) REFERENCES newcomers(id) ON DELETE CASCADE,
       FOREIGN KEY (author_id) REFERENCES users(id)
@@ -164,7 +258,7 @@ function initializeSchema() {
 
     CREATE TABLE IF NOT EXISTS mission_appointments (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      appointment_type TEXT CHECK(appointment_type IN ('STREET','PROMOTION')) NOT NULL,
+      appointment_type TEXT NOT NULL,
       title VARCHAR(200),
       description TEXT,
       appointment_date DATE,
@@ -179,7 +273,7 @@ function initializeSchema() {
     CREATE TABLE IF NOT EXISTS mission_logs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
-      log_type TEXT CHECK(log_type IN ('STREET','PROMOTION')) NOT NULL,
+      log_type TEXT NOT NULL,
       appointment_id INTEGER,
       content TEXT NOT NULL,
       location VARCHAR(200),
@@ -193,7 +287,7 @@ function initializeSchema() {
 
     CREATE TABLE IF NOT EXISTS posts (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      board_type TEXT CHECK(board_type IN ('NOTICE','SERMON','FREE','RESOURCE','FEEDBACK','CLUB_NOTICE')) NOT NULL,
+      board_type TEXT NOT NULL,
       club_id INTEGER,
       author_id INTEGER NOT NULL,
       title VARCHAR(200) NOT NULL,
@@ -222,7 +316,7 @@ function initializeSchema() {
     CREATE TABLE IF NOT EXISTS likes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
-      target_type TEXT CHECK(target_type IN ('POST','COMMENT','MISSION_LOG','PRAYER')) NOT NULL,
+      target_type TEXT NOT NULL,
       target_id INTEGER NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       UNIQUE(user_id, target_type, target_id)
@@ -274,17 +368,43 @@ function initializeSchema() {
       icon VARCHAR(10),
       display_order INTEGER DEFAULT 0
     );
-
-    CREATE INDEX IF NOT EXISTS idx_members_club ON club_members(club_id);
-    CREATE INDEX IF NOT EXISTS idx_sessions_club ON club_sessions(club_id, session_date);
-    CREATE INDEX IF NOT EXISTS idx_newcomers_club ON newcomers(club_id);
-    CREATE INDEX IF NOT EXISTS idx_newcomers_status ON newcomers(status);
-    CREATE INDEX IF NOT EXISTS idx_logs_newcomer ON activity_logs(newcomer_id);
-    CREATE INDEX IF NOT EXISTS idx_posts_board ON posts(board_type);
-    CREATE INDEX IF NOT EXISTS idx_comments_post ON comments(post_id);
-    CREATE INDEX IF NOT EXISTS idx_chat_club ON chat_messages(club_id, created_at);
-    CREATE INDEX IF NOT EXISTS idx_mission_logs_type ON mission_logs(log_type, created_at);
   `);
 }
 
-export default getDb;
+function saveToFile() {
+  if (!sqlDb || IS_VERCEL) return;
+  try {
+    const dataDir = path.dirname(DB_PATH);
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+    const data = sqlDb.export();
+    fs.writeFileSync(DB_PATH, Buffer.from(data));
+  } catch {
+    // Ignore save errors
+  }
+}
+
+// Synchronous-looking wrapper using a cached promise
+let dbPromise: Promise<DatabaseWrapper> | null = null;
+
+export default function getDb(): any {
+  // For compatibility: if DB is already initialized, return wrapper synchronously
+  if (sqlDb && initialized) {
+    return new DatabaseWrapper(sqlDb);
+  }
+  // This shouldn't happen after first init, but fallback
+  throw new Error('DB not initialized. Call initDbAsync() first.');
+}
+
+export async function initDbAsync(): Promise<any> {
+  if (sqlDb && initialized) {
+    return new DatabaseWrapper(sqlDb);
+  }
+  if (!dbPromise) {
+    dbPromise = initDb();
+  }
+  return dbPromise;
+}
+
+export { saveToFile };

@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import getDb from '@/lib/db';
+import { initDbAsync } from '@/lib/db';
 
 export async function POST(
   request: Request,
@@ -13,7 +13,7 @@ export async function POST(
     }
 
     const { id } = await params;
-    const db = getDb();
+    const db = await initDbAsync();
 
     const club = db.prepare('SELECT * FROM clubs WHERE id = ? AND is_active = 1').get(id) as any;
     if (!club) {
@@ -81,7 +81,7 @@ export async function GET(
     }
 
     const { id } = await params;
-    const db = getDb();
+    const db = await initDbAsync();
 
     const applications = db.prepare(`
       SELECT ca.*, u.name as user_name, u.email as user_email

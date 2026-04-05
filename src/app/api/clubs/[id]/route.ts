@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import getDb from '@/lib/db';
+import { initDbAsync } from '@/lib/db';
 
 export async function GET(
   request: Request,
@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const db = getDb();
+    const db = await initDbAsync();
 
     const club = db.prepare(`
       SELECT c.*,
@@ -39,7 +39,7 @@ export async function PUT(
     }
 
     const { id } = await params;
-    const db = getDb();
+    const db = await initDbAsync();
 
     // Check permission: ADMIN or club ADMIN
     if (user.role !== 'ADMIN') {
@@ -99,7 +99,7 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    const db = getDb();
+    const db = await initDbAsync();
 
     db.prepare('UPDATE clubs SET is_active = 0 WHERE id = ?').run(id);
 

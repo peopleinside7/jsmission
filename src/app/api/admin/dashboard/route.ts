@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import getDb from '@/lib/db';
+import { initDbAsync } from '@/lib/db';
 
 export async function GET(request: Request) {
   try {
@@ -12,7 +12,7 @@ export async function GET(request: Request) {
       return Response.json({ error: '관리자 권한이 필요합니다' }, { status: 403 });
     }
 
-    const db = getDb();
+    const db = await initDbAsync();
 
     const userCount = db.prepare(
       'SELECT COUNT(*) as count FROM users WHERE is_active = 1'
@@ -33,11 +33,15 @@ export async function GET(request: Request) {
       FROM newcomers
     `).get();
 
+    const pendingUsers = db.prepare(
+      "SELECT COUNT(*) as count FROM users WHERE is_approved = 0 AND is_active = 1"
+    ).get() as any;
+
     const recentUsers = db.prepare(`
-      SELECT id, name, email, role, created_at
+      SELECT id, name, phone, department, role, referral_source, is_approved, created_at
       FROM users
       ORDER BY created_at DESC
-      LIMIT 5
+      LIMIT 20
     `).all();
 
     const recentPosts = db.prepare(`
@@ -59,14 +63,23 @@ export async function GET(request: Request) {
         (SELECT COALESCE(SUM(attempt_count), 0) FROM mission_logs) as total_attempts
     `).get();
 
+    const clubStats = db.prepare(`
+      SELECT c.id, c.name, c.icon, c.icon_color,
+        (SELECT COUNT(*) FROM newcomers n WHERE n.club_id = c.id) as newcomer_count
+      FROM clubs c WHERE c.is_active = 1
+      ORDER BY c.display_order
+    `).all();
+
     return Response.json({
       userCount: userCount.count,
       clubCount: clubCount.count,
       newcomerPipeline,
       pendingApplications: pendingApplications.count,
+      pendingUsers: pendingUsers.count,
       missionStats,
       recentUsers,
       recentPosts,
+      clubStats,
     });
   } catch (error) {
     console.error('Admin dashboard error:', error);

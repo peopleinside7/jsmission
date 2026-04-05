@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import getDb from '@/lib/db';
+import { initDbAsync } from '@/lib/db';
 
 export async function GET(
   request: Request,
@@ -13,7 +13,7 @@ export async function GET(
     }
 
     const { id } = await params;
-    const db = getDb();
+    const db = await initDbAsync();
 
     const newcomer = db.prepare(`
       SELECT n.*,
@@ -50,7 +50,7 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const db = getDb();
+    const db = await initDbAsync();
 
     const fields: string[] = [];
     const values: any[] = [];

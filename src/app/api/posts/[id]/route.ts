@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import getDb from '@/lib/db';
+import { initDbAsync } from '@/lib/db';
 
 export async function GET(
   request: Request,
@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const db = getDb();
+    const db = await initDbAsync();
 
     // Increment view count
     db.prepare('UPDATE posts SET view_count = view_count + 1 WHERE id = ?').run(id);
@@ -50,7 +50,7 @@ export async function PUT(
     }
 
     const { id } = await params;
-    const db = getDb();
+    const db = await initDbAsync();
 
     const existing = db.prepare('SELECT author_id FROM posts WHERE id = ?').get(id) as any;
     if (!existing) {
@@ -99,7 +99,7 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    const db = getDb();
+    const db = await initDbAsync();
 
     const existing = db.prepare('SELECT author_id FROM posts WHERE id = ?').get(id) as any;
     if (!existing) {

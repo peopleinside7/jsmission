@@ -1,8 +1,8 @@
-import getDb from '@/lib/db';
+import { initDbAsync } from '@/lib/db';
 
 export async function GET() {
   try {
-    const db = getDb();
+    const db = await initDbAsync();
 
     const rankings = db.prepare(`
       SELECT c.id, c.name, c.icon, c.icon_color, c.category,

@@ -15,8 +15,12 @@ export async function GET() {
         clubs: clubCount?.count || 0,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Init error:', error);
-    return Response.json({ error: '초기화 중 오류가 발생했습니다' }, { status: 500 });
+    return Response.json({
+      error: '초기화 중 오류가 발생했습니다',
+      detail: error?.message || String(error),
+      stack: error?.stack?.substring(0, 500),
+    }, { status: 500 });
   }
 }

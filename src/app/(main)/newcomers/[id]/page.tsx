@@ -21,8 +21,8 @@ export default function NewcomerDetailPage() {
   const [logForm, setLogForm] = useState({ content: '', activity_type: 'ATTEMPT' });
 
   useEffect(() => {
-    fetch(`/api/newcomers/${params.id}`).then(r => r.json()).then(d => setNewcomer(d.newcomer));
-    fetch(`/api/newcomers/${params.id}/logs`).then(r => r.json()).then(d => setLogs(d.logs || []));
+    fetch(`/api/newcomers/${params.id}`).then(r => r.json()).then(d => setNewcomer(d.newcomer)).catch(() => {});
+    fetch(`/api/newcomers/${params.id}/logs`).then(r => r.json()).then(d => setLogs(d.logs || [])).catch(() => {});
   }, [params.id]);
 
   const handleStatusChange = async (status: string) => {

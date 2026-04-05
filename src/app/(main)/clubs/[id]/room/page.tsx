@@ -25,22 +25,26 @@ export default function ClubRoomPage() {
   const [members, setMembers] = useState<any[]>([]);
   const [newcomers, setNewcomers] = useState<any[]>([]);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const isMounted = useRef(true);
   const clubId = params.id;
 
   useEffect(() => {
     fetch(`/api/clubs/${clubId}`).then(r => r.json()).then(d => {
-      setClub(d.club);
-      if (!d.isMember) router.replace('/clubs');
-    });
-    fetch(`/api/clubs/${clubId}/members`).then(r => r.json()).then(d => setMembers(d.members || []));
-    fetch(`/api/clubs/${clubId}/newcomers`).then(r => r.json()).then(d => setNewcomers(d.newcomers || []));
+      if (isMounted.current) {
+        setClub(d.club);
+        if (!d.isMember) router.replace('/clubs');
+      }
+    }).catch(() => {});
+    fetch(`/api/clubs/${clubId}/members`).then(r => r.json()).then(d => { if (isMounted.current) setMembers(d.members || []); }).catch(() => {});
+    fetch(`/api/clubs/${clubId}/newcomers`).then(r => r.json()).then(d => { if (isMounted.current) setNewcomers(d.newcomers || []); }).catch(() => {});
+    return () => { isMounted.current = false; };
   }, [clubId]);
 
   // Chat polling
   useEffect(() => {
     if (tab !== 2) return;
     const fetchChat = () => {
-      fetch(`/api/clubs/${clubId}/chat`).then(r => r.json()).then(d => setMessages(d.messages || []));
+      fetch(`/api/clubs/${clubId}/chat`).then(r => r.json()).then(d => { if (isMounted.current) setMessages(d.messages || []); }).catch(() => {});
     };
     fetchChat();
     const interval = setInterval(fetchChat, 3000);

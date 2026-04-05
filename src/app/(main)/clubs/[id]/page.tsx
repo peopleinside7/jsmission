@@ -31,7 +31,7 @@ export default function ClubDetailPage() {
     fetch(`/api/clubs/${params.id}`).then(r => r.json()).then(d => {
       setClub(d.club);
       setIsMember(d.isMember || false);
-    });
+    }).catch(() => {});
   }, [params.id]);
 
   const handleApply = async (e: React.FormEvent) => {

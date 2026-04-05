@@ -11,7 +11,7 @@ export default function AdminUsersPage() {
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved'>('all');
 
   useEffect(() => {
-    fetch('/api/admin/dashboard').then(r => r.json()).then(d => setUsers(d.recentUsers || []));
+    fetch('/api/admin/dashboard').then(r => r.json()).then(d => setUsers(d.recentUsers || [])).catch(() => {});
   }, []);
 
   const handleApprove = async (userId: number) => {

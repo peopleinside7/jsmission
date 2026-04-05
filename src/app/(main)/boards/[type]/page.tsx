@@ -22,7 +22,7 @@ export default function BoardPage() {
     fetch(`/api/boards/${boardType}`).then(r => r.json()).then(d => {
       setPosts(d.posts || []);
       setLoading(false);
-    });
+    }).catch(() => { setLoading(false); });
   }, [boardType]);
 
   const handleWrite = async (e: React.FormEvent) => {

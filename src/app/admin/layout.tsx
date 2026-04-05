@@ -32,8 +32,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           setUser(data.user);
           setInitialized(true);
         })
-        .catch(() => router.replace('/login'));
-    });
+        .catch(() => {
+          // Try token refresh before redirecting to login
+          fetch('/api/auth/refresh', { method: 'POST' })
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(() => fetch('/api/auth/me'))
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(data => {
+              if (data.user.role !== 'ADMIN') {
+                router.replace('/home');
+                return;
+              }
+              setUser(data.user);
+              setInitialized(true);
+            })
+            .catch(() => router.replace('/login'));
+        });
+    }).catch(() => router.replace('/login'));
   }, []);
 
   const handleLogout = async () => {

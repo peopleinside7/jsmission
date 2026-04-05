@@ -15,8 +15,8 @@ export default function AdminDashboard() {
   const [pipeline, setPipeline] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    fetch('/api/admin/dashboard').then(r => r.json()).then(d => setStats(d));
-    fetch('/api/newcomers/dashboard').then(r => r.json()).then(d => setPipeline(d.pipeline || {}));
+    fetch('/api/admin/dashboard').then(r => r.json()).then(d => setStats(d)).catch(() => {});
+    fetch('/api/newcomers/dashboard').then(r => r.json()).then(d => setPipeline(d.pipeline || {})).catch(() => {});
   }, []);
 
   if (!stats) return <div className="flex items-center justify-center h-64"><div className="w-8 h-8 border-4 border-[#E8F5E9] border-t-[#1E5631] rounded-full animate-spin" /></div>;

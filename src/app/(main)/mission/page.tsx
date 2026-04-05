@@ -31,9 +31,9 @@ export default function MissionPage() {
   });
 
   useEffect(() => {
-    fetch('/api/newcomers/dashboard').then(r => r.json()).then(d => setPipeline(d.pipeline || {}));
-    fetch('/api/mission/appointments').then(r => r.json()).then(d => setAppointments(d.appointments || []));
-    fetch('/api/mission/logs').then(r => r.json()).then(d => setLogs(d.logs || []));
+    fetch('/api/newcomers/dashboard').then(r => r.json()).then(d => setPipeline(d.pipeline || {})).catch(() => {});
+    fetch('/api/mission/appointments').then(r => r.json()).then(d => setAppointments(d.appointments || [])).catch(() => {});
+    fetch('/api/mission/logs').then(r => r.json()).then(d => setLogs(d.logs || [])).catch(() => {});
   }, []);
 
   const handleCreateAppt = async (e: React.FormEvent) => {

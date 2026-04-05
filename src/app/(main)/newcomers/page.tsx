@@ -29,8 +29,8 @@ export default function NewcomersPage() {
     fetch('/api/newcomers/dashboard?withList=true').then(r => r.json()).then(d => {
       setPipeline(d.pipeline || {});
       setNewcomers(d.newcomers || []);
-    });
-    fetch('/api/clubs').then(r => r.json()).then(d => setClubs(d.clubs || []));
+    }).catch(() => {});
+    fetch('/api/clubs').then(r => r.json()).then(d => setClubs(d.clubs || [])).catch(() => {});
   }, []);
 
   const filtered = newcomers.filter(n => {

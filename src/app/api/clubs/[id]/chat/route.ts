@@ -65,6 +65,9 @@ export async function POST(
     if (!content && !image_path) {
       return Response.json({ error: '메시지 내용을 입력해주세요' }, { status: 400 });
     }
+    if (content && content.length > 500) {
+      return Response.json({ error: '메시지는 500자 이하로 입력해주세요' }, { status: 400 });
+    }
 
     const result = db.prepare(
       'INSERT INTO chat_messages (club_id, user_id, content, image_path) VALUES (?, ?, ?, ?)'

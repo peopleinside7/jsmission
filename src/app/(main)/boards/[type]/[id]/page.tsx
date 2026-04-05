@@ -19,8 +19,8 @@ export default function PostDetailPage() {
       setPost(d.post);
       setLiked(d.post?.is_liked || false);
       setLikeCount(d.post?.like_count || 0);
-    });
-    fetch(`/api/posts/${params.id}/comments`).then(r => r.json()).then(d => setComments(d.comments || []));
+    }).catch(() => {});
+    fetch(`/api/posts/${params.id}/comments`).then(r => r.json()).then(d => setComments(d.comments || [])).catch(() => {});
   }, [params.id]);
 
   const toggleLike = async () => {
@@ -44,7 +44,7 @@ export default function PostDetailPage() {
     if (res.ok) {
       setNewComment('');
       setReplyTo(null);
-      fetch(`/api/posts/${params.id}/comments`).then(r => r.json()).then(d => setComments(d.comments || []));
+      fetch(`/api/posts/${params.id}/comments`).then(r => r.json()).then(d => setComments(d.comments || [])).catch(() => {});
     }
   };
 

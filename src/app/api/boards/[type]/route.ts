@@ -22,7 +22,7 @@ export async function GET(
 
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
-    const limit = parseInt(url.searchParams.get('limit') || '20');
+    const limit = Math.min(parseInt(url.searchParams.get('limit') || '20'), 100);
     const offset = (page - 1) * limit;
 
     const db = await initDbAsync();
@@ -87,6 +87,12 @@ export async function POST(
 
     if (!title) {
       return Response.json({ error: '제목은 필수입니다' }, { status: 400 });
+    }
+    if (title.length > 200) {
+      return Response.json({ error: '제목은 200자 이하로 입력해주세요' }, { status: 400 });
+    }
+    if (content && content.length > 10000) {
+      return Response.json({ error: '내용은 10000자 이하로 입력해주세요' }, { status: 400 });
     }
 
     const db = await initDbAsync();

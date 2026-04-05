@@ -28,12 +28,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-[#F5F5F5]">
         {children}
-        <ToastContainer />
       </body>
     </html>
   );
-}
-
-function ToastContainer() {
-  return <div id="toast-root" />;
 }

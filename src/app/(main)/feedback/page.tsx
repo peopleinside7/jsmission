@@ -11,7 +11,7 @@ export default function FeedbackPage() {
   const [form, setForm] = useState({ title: '', content: '' });
 
   useEffect(() => {
-    fetch('/api/boards/FEEDBACK').then(r => r.json()).then(d => setFeedbacks(d.posts || []));
+    fetch('/api/boards/FEEDBACK').then(r => r.json()).then(d => setFeedbacks(d.posts || [])).catch(() => {});
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

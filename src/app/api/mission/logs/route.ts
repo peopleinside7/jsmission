@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const logType = url.searchParams.get('type');
     const page = parseInt(url.searchParams.get('page') || '1');
-    const limit = parseInt(url.searchParams.get('limit') || '20');
+    const limit = Math.min(parseInt(url.searchParams.get('limit') || '20'), 100);
     const offset = (page - 1) * limit;
 
     const db = await initDbAsync();

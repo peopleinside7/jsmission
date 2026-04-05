@@ -64,6 +64,9 @@ export async function POST(
     if (!content) {
       return Response.json({ error: '댓글 내용을 입력해주세요' }, { status: 400 });
     }
+    if (content.length > 2000) {
+      return Response.json({ error: '댓글은 2000자 이하로 입력해주세요' }, { status: 400 });
+    }
 
     const db = await initDbAsync();
 

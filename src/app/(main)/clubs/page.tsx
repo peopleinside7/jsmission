@@ -20,8 +20,8 @@ export default function ClubsPage() {
   const [rankings, setRankings] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch('/api/clubs').then(r => r.json()).then(d => setClubs(d.clubs || []));
-    fetch('/api/clubs/rankings').then(r => r.json()).then(d => setRankings(d.rankings || []));
+    fetch('/api/clubs').then(r => r.json()).then(d => setClubs(d.clubs || [])).catch(() => {});
+    fetch('/api/clubs/rankings').then(r => r.json()).then(d => setRankings(d.rankings || [])).catch(() => {});
   }, []);
 
   const filtered = category === '전체' ? clubs : clubs.filter(c => c.category === category);
@@ -156,7 +156,8 @@ function PrayerRoom() {
   useEffect(() => {
     fetch('/api/newcomers/dashboard?withList=true')
       .then(r => r.json())
-      .then(d => setNewcomers(d.newcomers || []));
+      .then(d => setNewcomers(d.newcomers || []))
+      .catch(() => {});
   }, []);
 
   const handlePray = async (id: number) => {

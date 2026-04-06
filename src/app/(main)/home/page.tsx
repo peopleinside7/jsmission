@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Bell, Menu, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Bell, Menu, ChevronRight } from 'lucide-react';
 
 const CATEGORY_CHIPS = [
   { label: '선교동아리', href: '/clubs' },
@@ -30,7 +30,7 @@ const QUICK_MENUS = [
 interface ClubData {
   id: number; name: string; icon: string; icon_color: string;
   slogan: string; category: string; recruitment_status: string;
-  member_count: number; schedule_text: string; poster_image?: string;
+  member_count: number; poster_image?: string;
 }
 
 export default function HomePage() {
@@ -38,31 +38,29 @@ export default function HomePage() {
   const [clubs, setClubs] = useState<ClubData[]>([]);
   const [notices, setNotices] = useState<any[]>([]);
   const [activeChip, setActiveChip] = useState<number | null>(null);
-  const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch('/api/clubs').then(r => r.json()).then(d => setClubs(d.clubs || [])).catch(() => {});
     fetch('/api/boards/NOTICE').then(r => r.json()).then(d => setNotices((d.posts || []).slice(0, 3))).catch(() => {});
   }, []);
 
-  const scrollCarousel = (direction: 'left' | 'right') => {
-    if (!carouselRef.current) return;
-    const scrollAmount = 280;
-    carouselRef.current.scrollBy({
-      left: direction === 'left' ? -scrollAmount : scrollAmount,
-      behavior: 'smooth',
-    });
-  };
-
   return (
     <div className="pb-24">
-      {/* ── Header (1, 7, 8) ── */}
+      {/* ── 1. Header: 녹색 배경 + SVG 독수리 로고 + JS MISSION + 사용자명 + 알림 + 메뉴 ── */}
       <div className="bg-[#1E5631] px-4 pt-3 pb-4 sticky top-0 z-50">
         <div className="flex items-center justify-between max-w-[640px] mx-auto">
+          {/* 로고: SVG 독수리 + JS MISSION 텍스트 */}
           <div className="flex items-center gap-2">
-            <Image src="/logo_h.png" alt="JS MISSION" width={110} height={32} className="brightness-0 invert" />
+            <svg width="28" height="28" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 4C16 8 10 12 8 18C6 24 10 30 16 32C12 28 12 22 14 18C16 14 20 10 20 4Z" fill="white" opacity="0.9"/>
+              <path d="M20 4C24 8 30 12 32 18C34 24 30 30 24 32C28 28 28 22 26 18C24 14 20 10 20 4Z" fill="white" opacity="0.7"/>
+              <path d="M20 8C18 14 14 18 12 22C10 26 12 30 16 32L20 28L24 32C28 30 30 26 28 22C26 18 22 14 20 8Z" fill="white" opacity="0.5"/>
+            </svg>
+            <span className="text-white font-bold text-lg tracking-wide">JS MISSION</span>
           </div>
+          {/* 우측: 사용자명 + 알림 + 메뉴 */}
           <div className="flex items-center gap-3">
+            <span className="text-white/90 text-xs font-medium">{user?.name} 회원님</span>
             <Link href="/mypage" className="relative">
               <Bell className="w-5 h-5 text-white/90" />
               <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#E53935] rounded-full" />
@@ -75,7 +73,7 @@ export default function HomePage() {
       </div>
 
       <div className="max-w-[640px] mx-auto">
-        {/* ── Category Chips (2) ── */}
+        {/* ── 2. Category Chips ── */}
         <div className="px-4 pt-4 pb-2">
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
             {CATEGORY_CHIPS.map((chip, i) => (
@@ -96,17 +94,8 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* ── Welcome ── */}
-        <div className="px-4 mb-4">
-          <div className="bg-white rounded-2xl p-4 border border-[#EEE] shadow-sm">
-            <p className="text-xs text-[#999]">환영합니다</p>
-            <p className="text-base font-bold text-[#1A1A1A]">{user?.name}님, 샬롬!</p>
-            <p className="text-xs text-[#999] mt-0.5">오늘도 선교의 사명을 감당해주세요</p>
-          </div>
-        </div>
-
-        {/* ── Club Cards Carousel (4) ── */}
-        <div className="mb-6">
+        {/* ── 3. 동아리 포스터 그리드 (2열, 절반 크기) ── */}
+        <div className="mb-5">
           <div className="flex items-center justify-between px-4 mb-3">
             <h2 className="text-base font-bold text-[#1A1A1A]">선교동아리</h2>
             <Link href="/clubs" className="text-xs text-[#999] flex items-center gap-0.5">
@@ -114,75 +103,54 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {/* Carousel */}
-          <div className="relative group">
-            {/* Left arrow */}
-            <button
-              onClick={() => scrollCarousel('left')}
-              className="absolute left-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white/90 rounded-full shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-              aria-label="이전"
-            >
-              <ChevronLeft className="w-4 h-4 text-[#666]" />
-            </button>
-
-            <div
-              ref={carouselRef}
-              className="flex gap-3 overflow-x-auto px-4 pb-2 scroll-smooth scrollbar-hide snap-x snap-mandatory"
-            >
-              {clubs.map(club => (
-                <Link
-                  key={club.id}
-                  href={`/clubs/${club.id}`}
-                  className="snap-start shrink-0 w-[200px] bg-white rounded-2xl border border-[#EEE] shadow-sm overflow-hidden hover:shadow-md transition-shadow"
-                >
-                  {/* Poster image or fallback icon */}
-                  <div
-                    className="w-full h-[260px] flex items-center justify-center overflow-hidden relative"
-                    style={{ backgroundColor: club.icon_color }}
-                  >
-                    {club.poster_image ? (
-                      <Image
-                        src={club.poster_image}
-                        alt={club.name}
-                        fill
-                        className="object-cover"
-                        sizes="200px"
-                      />
-                    ) : (
-                      <span className="text-6xl">{club.icon}</span>
-                    )}
-                  </div>
-                  {/* Info */}
-                  <div className="p-3">
-                    <p className="text-sm font-bold text-[#1A1A1A] truncate">{club.name}</p>
-                    <p className="text-xs text-[#999] mt-0.5 truncate">{club.slogan}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
-                        club.recruitment_status === 'OPEN'
-                          ? 'bg-[#E8F5E9] text-[#1E5631]'
-                          : 'bg-gray-100 text-[#999]'
-                      }`}>
-                        {club.recruitment_status === 'OPEN' ? '모집중' : '마감'}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
+          {/* 2열 그리드 - 가로 스크롤 */}
+          <div className="px-4 overflow-x-auto scrollbar-hide">
+            <div className="flex gap-2.5 pb-2" style={{ width: `${Math.ceil(clubs.length / 2) * 160 + (Math.ceil(clubs.length / 2) - 1) * 10}px` }}>
+              {Array.from({ length: Math.ceil(clubs.length / 2) }).map((_, colIdx) => (
+                <div key={colIdx} className="flex flex-col gap-2.5 shrink-0" style={{ width: '155px' }}>
+                  {[clubs[colIdx * 2], clubs[colIdx * 2 + 1]].filter(Boolean).map(club => (
+                    <Link
+                      key={club.id}
+                      href={`/clubs/${club.id}`}
+                      className="bg-white rounded-xl border border-[#EEE] shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                    >
+                      <div
+                        className="w-full h-[120px] flex items-center justify-center overflow-hidden relative"
+                        style={{ backgroundColor: club.icon_color }}
+                      >
+                        {club.poster_image ? (
+                          <Image
+                            src={club.poster_image}
+                            alt={club.name}
+                            fill
+                            className="object-cover"
+                            sizes="155px"
+                          />
+                        ) : (
+                          <span className="text-4xl">{club.icon}</span>
+                        )}
+                      </div>
+                      <div className="p-2">
+                        <p className="text-xs font-bold text-[#1A1A1A] truncate">{club.name}</p>
+                        <p className="text-[10px] text-[#999] mt-0.5 truncate">{club.slogan}</p>
+                        <span className={`inline-block mt-1 text-[9px] px-1.5 py-0.5 rounded-full font-medium ${
+                          club.recruitment_status === 'OPEN'
+                            ? 'bg-[#E8F5E9] text-[#1E5631]'
+                            : 'bg-gray-100 text-[#999]'
+                        }`}>
+                          {club.recruitment_status === 'OPEN' ? '모집중' : '마감'}
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
               ))}
             </div>
-
-            {/* Right arrow */}
-            <button
-              onClick={() => scrollCarousel('right')}
-              className="absolute right-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white/90 rounded-full shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-              aria-label="다음"
-            >
-              <ChevronRight className="w-4 h-4 text-[#666]" />
-            </button>
           </div>
         </div>
 
         {/* ── Quick Menu Grid ── */}
-        <div className="px-4 mb-6">
+        <div className="px-4 mb-5">
           <div className="grid grid-cols-3 gap-2.5">
             {QUICK_MENUS.map(menu => (
               <Link

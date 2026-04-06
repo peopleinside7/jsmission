@@ -76,16 +76,6 @@ export function seedDatabase(db: any) {
       poster_image: '/clubs/poster_2.jpg'
     },
     {
-      name: 'RUN&GLOW 러닝크루', icon: '✨', icon_color: '#FFF9C4',
-      slogan: '나이 들수록 빛나는 우리, 함께 해요',
-      category: '스포츠', target_age: '30~40대', target_gender: '미혼 여성',
-      schedule_text: '매주 일요일 오후', fee_text: '별도',
-      max_members: null, total_sessions: null,
-      instructor_info: null, curriculum: null,
-      location: '안산 및 근교', recruitment_status: 'OPEN',
-      poster_image: '/clubs/poster_2.jpg'
-    },
-    {
       name: '디어댄스', icon: '💃', icon_color: '#FCE4EC',
       slogan: '오늘은 내가 아이돌',
       category: '문화', target_age: '1020', target_gender: '여성',
@@ -139,11 +129,11 @@ export function seedDatabase(db: any) {
 
   // Add some club members (demo users join clubs)
   const insertMember = db.prepare(`INSERT INTO club_members (club_id, user_id, role) VALUES (?, ?, ?)`);
-  insertMember.run(1, 2, 'ADMIN');
+  insertMember.run(1, 2, 'ADMIN');  // 오물오물 잉글리시
   insertMember.run(1, 3, 'MEMBER');
-  insertMember.run(2, 4, 'ADMIN');
-  insertMember.run(3, 5, 'ADMIN');
-  insertMember.run(4, 6, 'ADMIN');
+  insertMember.run(2, 4, 'ADMIN');  // 일본어 오니기리
+  insertMember.run(3, 5, 'ADMIN');  // POWER FC
+  insertMember.run(4, 6, 'ADMIN');  // 여자 플로우 러닝크루
 
   // Demo newcomers
   const insertNewcomer = db.prepare(`

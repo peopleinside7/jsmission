@@ -41,7 +41,7 @@ export function seedDatabase(db: any) {
       instructor_info: '무역회사 해외영업 11년, 40여개국 바이어 상담',
       curriculum: JSON.stringify(['영어 성경 낭독', '발음·억양 훈련', '문장 구조 이해', '작문·영어 일기', '복습', '마무리']),
       location: '추후 공지', recruitment_status: 'OPEN',
-      poster_image: '/clubs/poster_1.jpg'
+      poster_image: '/clubs/poster_1.png'
     },
     {
       name: '일본어 회화 오니기리', icon: '🍙', icon_color: '#EFEBE9',
@@ -52,7 +52,7 @@ export function seedDatabase(db: any) {
       instructor_info: 'JLPT 2급, 일본 거주 3년, 투어 가이드',
       curriculum: JSON.stringify(['히라가나·가타카나', '취미 표현', '일상 표현', '음식·주문', '여행①', '여행②', '감정·근황', '자유 회화']),
       location: '추후 공지', recruitment_status: 'OPEN',
-      poster_image: '/clubs/poster_4.jpg'
+      poster_image: '/clubs/poster_4.png'
     },
     {
       name: 'POWER F.C', icon: '⚽', icon_color: '#E3F2FD',
@@ -63,7 +63,7 @@ export function seedDatabase(db: any) {
       instructor_info: null, curriculum: null,
       location: '초지고', recruitment_status: 'OPEN',
       external_link: '당근마켓 파워FC',
-      poster_image: '/clubs/poster_3.jpg'
+      poster_image: '/clubs/poster_3.png'
     },
     {
       name: '여자 플로우 러닝크루', icon: '🏃‍♀️', icon_color: '#E3F2FD',
@@ -73,7 +73,7 @@ export function seedDatabase(db: any) {
       max_members: null, total_sessions: null,
       instructor_info: null, curriculum: null,
       location: '호수공원 수변로 or 와스타디움', recruitment_status: 'OPEN',
-      poster_image: '/clubs/poster_2.jpg'
+      poster_image: '/clubs/poster_2.png'
     },
     {
       name: '디어댄스', icon: '💃', icon_color: '#FCE4EC',
@@ -84,7 +84,7 @@ export function seedDatabase(db: any) {
       instructor_info: '댄스강사 3년+, 릴스 1만회+, 커버댄스 디렉팅',
       curriculum: JSON.stringify(['기본기', '안무①', '안무②', '완성촬영']),
       location: '안산 내 연습실', recruitment_status: 'CLOSED',
-      poster_image: '/clubs/poster_5.jpg'
+      poster_image: '/clubs/poster_5.png'
     },
     {
       name: '캠퍼스 나침반', icon: '🧭', icon_color: '#E8F5E9',
@@ -94,7 +94,7 @@ export function seedDatabase(db: any) {
       max_members: null, total_sessions: null,
       instructor_info: null, curriculum: null,
       location: null, recruitment_status: 'OPEN',
-      poster_image: '/clubs/poster_6.jpg'
+      poster_image: '/clubs/poster_6.png'
     },
     {
       name: 'JS 하모닉스', icon: '🎵', icon_color: '#EDE7F6',
@@ -105,7 +105,7 @@ export function seedDatabase(db: any) {
       max_members: null, total_sessions: null,
       instructor_info: null, curriculum: null,
       location: null, recruitment_status: 'OPEN',
-      poster_image: '/clubs/poster_7.jpg'
+      poster_image: '/clubs/poster_7.png'
     }
   ];
 

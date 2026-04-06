@@ -116,7 +116,7 @@ export default function HomePage() {
                     >
                       {/* 포스터: 패딩 여백 + 라운드 */}
                       <div className="p-2.5">
-                        <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-white border border-[#D5D5D5]">
+                        <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-white border border-[#E0E0E0] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
                           {club.poster_image ? (
                             <Image
                               src={club.poster_image}

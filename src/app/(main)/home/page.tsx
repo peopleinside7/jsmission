@@ -112,12 +112,11 @@ export default function HomePage() {
                     <Link
                       key={club.id}
                       href={`/clubs/${club.id}`}
-                      className="rounded-2xl overflow-hidden hover:shadow-lg transition-shadow border border-[#E8E0F0]"
-                      style={{ backgroundColor: '#F3EEFF' }}
+                      className="rounded-2xl overflow-hidden hover:shadow-md transition-shadow border border-[#E0E0E0] bg-[#F5F5F5]"
                     >
                       {/* 포스터: 패딩 여백 + 라운드 */}
                       <div className="p-2.5">
-                        <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-white shadow-sm">
+                        <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-white border border-[#D5D5D5]">
                           {club.poster_image ? (
                             <Image
                               src={club.poster_image}

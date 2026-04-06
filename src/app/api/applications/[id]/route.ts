@@ -13,7 +13,7 @@ export async function PUT(
     }
 
     const { id } = await params;
-    const { status } = await request.json();
+    const { status } = JSON.parse(await request.text());
 
     if (!status || !['APPROVED', 'REJECTED'].includes(status)) {
       return Response.json({ error: '유효하지 않은 상태입니다' }, { status: 400 });

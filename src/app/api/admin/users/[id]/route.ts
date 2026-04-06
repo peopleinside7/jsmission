@@ -17,7 +17,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       return Response.json({ error: '올바르지 않은 사용자 ID입니다' }, { status: 400 });
     }
 
-    const body = await request.json();
+    const body = JSON.parse(await request.text());
     const db = await initDbAsync();
 
     // Check target user exists

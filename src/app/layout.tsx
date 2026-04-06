@@ -25,8 +25,12 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
+        <link
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"
+          rel="stylesheet"
+        />
       </head>
-      <body className="min-h-screen bg-[#F5F5F5]">
+      <body className="min-h-screen bg-[#F5F5F5]" style={{ fontFamily: "'Pretendard', 'Noto Sans KR', -apple-system, sans-serif" }}>
         {children}
       </body>
     </html>

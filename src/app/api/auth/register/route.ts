@@ -3,7 +3,7 @@ import { initDbAsync } from '@/lib/db';
 
 export async function POST(request: Request) {
   try {
-    const { name, phone, password, department, referral_source } = await request.json();
+    const { name, phone, password, department, referral_source } = JSON.parse(await request.text());
 
     if (!name || !phone || !password) {
       return Response.json({ error: '이름, 연락처, 비밀번호는 필수입니다' }, { status: 400 });

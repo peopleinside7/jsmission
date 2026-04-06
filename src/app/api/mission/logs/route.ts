@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     const {
       log_type, appointment_id, content,
       location, result_summary, attempt_count, images,
-    } = await request.json();
+    } = JSON.parse(await request.text());
 
     if (!log_type || !content) {
       return Response.json({ error: '유형과 내용은 필수입니다' }, { status: 400 });

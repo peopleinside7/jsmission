@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       return Response.json({ error: '관리자 권한이 필요합니다' }, { status: 403 });
     }
 
-    const body = await request.json();
+    const body = JSON.parse(await request.text());
     const {
       name, icon, icon_color, slogan, description, category,
       poster_image, target_age, target_gender, max_members,

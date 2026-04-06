@@ -61,7 +61,7 @@ export async function PUT(
     }
 
     const { id } = await params;
-    const body = await request.json();
+    const body = JSON.parse(await request.text());
     const db = await initDbAsync();
 
     const existing = db.prepare('SELECT * FROM newcomers WHERE id = ?').get(id);

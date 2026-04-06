@@ -9,7 +9,7 @@ import { NextResponse } from 'next/server';
 // Case 2: { currentPassword, newPassword } - Change password (authenticated)
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = JSON.parse(await request.text());
     const db = await initDbAsync();
 
     // Case 1: Reset by phone (generate temporary password)

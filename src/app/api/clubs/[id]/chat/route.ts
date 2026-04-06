@@ -60,7 +60,7 @@ export async function POST(
       return Response.json({ error: '동아리 멤버만 메시지를 보낼 수 있습니다' }, { status: 403 });
     }
 
-    const { content, image_path } = await request.json();
+    const { content, image_path } = JSON.parse(await request.text());
 
     if (!content && !image_path) {
       return Response.json({ error: '메시지 내용을 입력해주세요' }, { status: 400 });

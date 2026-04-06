@@ -40,7 +40,7 @@ export async function POST(
       return Response.json({ error: '이미 신청 중입니다' }, { status: 409 });
     }
 
-    const { purpose, target_type, department, phone } = await request.json();
+    const { purpose, target_type, department, phone } = JSON.parse(await request.text());
 
     if (club.approval_mode === 'AUTO') {
       // Auto approve

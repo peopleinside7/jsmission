@@ -74,7 +74,7 @@ export async function POST(
       }
     }
 
-    const body = await request.json();
+    const body = JSON.parse(await request.text());
     const {
       name, phone, age_group, gender, introduction,
       how_met, status, prayer_request, assigned_to, notes,

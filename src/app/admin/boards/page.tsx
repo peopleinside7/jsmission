@@ -17,7 +17,7 @@ export default function AdminBoardsPage() {
   const [form, setForm] = useState({ title: '', content: '' });
 
   useEffect(() => {
-    fetch(`/api/boards/${boardType}`).then(r => r.json()).then(d => setPosts(d.posts || []));
+    fetch(`/api/boards/${boardType}`).then(r => r.json()).then(d => setPosts(d.posts || [])).catch(() => {});
   }, [boardType]);
 
   const handleWrite = async (e: React.FormEvent) => {

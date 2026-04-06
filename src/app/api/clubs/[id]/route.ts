@@ -64,7 +64,7 @@ export async function PUT(
       }
     }
 
-    const body = await request.json();
+    const body = JSON.parse(await request.text());
     const fields: string[] = [];
     const values: any[] = [];
 

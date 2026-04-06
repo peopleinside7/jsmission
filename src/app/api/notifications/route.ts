@@ -36,7 +36,7 @@ export async function PUT(request: Request) {
       return Response.json({ error: '로그인이 필요합니다' }, { status: 401 });
     }
 
-    const body = await request.json();
+    const body = JSON.parse(await request.text());
     const { id } = body;
 
     const db = await initDbAsync();

@@ -82,7 +82,7 @@ export async function POST(
       return Response.json({ error: '권한이 없습니다' }, { status: 403 });
     }
 
-    const body = await request.json();
+    const body = JSON.parse(await request.text());
     const { title, content, club_id, file_path, file_name, resource_category } = body;
 
     if (!title) {

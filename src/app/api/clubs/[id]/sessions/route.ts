@@ -61,7 +61,7 @@ export async function POST(
       }
     }
 
-    const body = await request.json();
+    const body = JSON.parse(await request.text());
     const { sessions } = body;
 
     if (sessions && Array.isArray(sessions)) {

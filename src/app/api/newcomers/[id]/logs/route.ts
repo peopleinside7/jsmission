@@ -55,7 +55,7 @@ export async function POST(
     }
 
     const { id } = await params;
-    const { content, activity_type } = await request.json();
+    const { content, activity_type } = JSON.parse(await request.text());
 
     if (!content || !activity_type) {
       return Response.json({ error: '내용과 활동 유형은 필수입니다' }, { status: 400 });

@@ -13,7 +13,7 @@ export async function POST(
     }
 
     const { id } = await params;
-    const { content } = await request.json();
+    const { content } = JSON.parse(await request.text());
 
     const db = await initDbAsync();
 

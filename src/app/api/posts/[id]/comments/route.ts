@@ -59,7 +59,7 @@ export async function POST(
     }
 
     const { id } = await params;
-    const { content, parent_id } = await request.json();
+    const { content, parent_id } = JSON.parse(await request.text());
 
     if (!content) {
       return Response.json({ error: '댓글 내용을 입력해주세요' }, { status: 400 });

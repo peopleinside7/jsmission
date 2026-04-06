@@ -40,7 +40,8 @@ export function seedDatabase(db: any) {
       max_members: 8, total_sessions: 6,
       instructor_info: '무역회사 해외영업 11년, 40여개국 바이어 상담',
       curriculum: JSON.stringify(['영어 성경 낭독', '발음·억양 훈련', '문장 구조 이해', '작문·영어 일기', '복습', '마무리']),
-      location: '추후 공지', recruitment_status: 'OPEN'
+      location: '추후 공지', recruitment_status: 'OPEN',
+      poster_image: '/clubs/poster_english.jpg'
     },
     {
       name: '일본어 회화 오니기리', icon: '🍙', icon_color: '#EFEBE9',
@@ -50,7 +51,8 @@ export function seedDatabase(db: any) {
       max_members: 20, total_sessions: 8,
       instructor_info: 'JLPT 2급, 일본 거주 3년, 투어 가이드',
       curriculum: JSON.stringify(['히라가나·가타카나', '취미 표현', '일상 표현', '음식·주문', '여행①', '여행②', '감정·근황', '자유 회화']),
-      location: '추후 공지', recruitment_status: 'OPEN'
+      location: '추후 공지', recruitment_status: 'OPEN',
+      poster_image: '/clubs/poster_onigiri.jpg'
     },
     {
       name: 'POWER F.C', icon: '⚽', icon_color: '#E3F2FD',
@@ -60,7 +62,8 @@ export function seedDatabase(db: any) {
       max_members: null, total_sessions: null,
       instructor_info: null, curriculum: null,
       location: '초지고', recruitment_status: 'OPEN',
-      external_link: '당근마켓 파워FC'
+      external_link: '당근마켓 파워FC',
+      poster_image: '/clubs/poster_powerfc.jpg'
     },
     {
       name: '여자 플로우 러닝크루', icon: '🏃‍♀️', icon_color: '#E3F2FD',
@@ -69,7 +72,8 @@ export function seedDatabase(db: any) {
       schedule_text: '매주 화,목 19:30', fee_text: '10,000원(첫회만)',
       max_members: null, total_sessions: null,
       instructor_info: null, curriculum: null,
-      location: '호수공원 수변로 or 와스타디움', recruitment_status: 'OPEN'
+      location: '호수공원 수변로 or 와스타디움', recruitment_status: 'OPEN',
+      poster_image: '/clubs/poster_running.jpg'
     },
     {
       name: 'RUN&GLOW 러닝크루', icon: '✨', icon_color: '#FFF9C4',
@@ -78,7 +82,8 @@ export function seedDatabase(db: any) {
       schedule_text: '매주 일요일 오후', fee_text: '별도',
       max_members: null, total_sessions: null,
       instructor_info: null, curriculum: null,
-      location: '안산 및 근교', recruitment_status: 'OPEN'
+      location: '안산 및 근교', recruitment_status: 'OPEN',
+      poster_image: '/clubs/poster_runglow.jpg'
     },
     {
       name: '디어댄스', icon: '💃', icon_color: '#FCE4EC',
@@ -88,7 +93,8 @@ export function seedDatabase(db: any) {
       max_members: null, total_sessions: 4,
       instructor_info: '댄스강사 3년+, 릴스 1만회+, 커버댄스 디렉팅',
       curriculum: JSON.stringify(['기본기', '안무①', '안무②', '완성촬영']),
-      location: '안산 내 연습실', recruitment_status: 'CLOSED'
+      location: '안산 내 연습실', recruitment_status: 'CLOSED',
+      poster_image: '/clubs/poster_deardance.jpg'
     },
     {
       name: '캠퍼스 나침반', icon: '🧭', icon_color: '#E8F5E9',
@@ -97,24 +103,26 @@ export function seedDatabase(db: any) {
       schedule_text: '상시', fee_text: '무료',
       max_members: null, total_sessions: null,
       instructor_info: null, curriculum: null,
-      location: null, recruitment_status: 'OPEN'
+      location: null, recruitment_status: 'OPEN',
+      poster_image: '/clubs/poster_campus.jpg'
     },
     {
       name: 'JS 하모닉스', icon: '🎵', icon_color: '#EDE7F6',
-      slogan: '친교와 음악을 통한 선교',
+      slogan: '주성령 ♡ 하나된 하모니로',
       category: '찬양', target_age: '음악 관심자', target_gender: null,
       schedule_text: '주 1회', fee_text: '별도',
       max_members: null, total_sessions: null,
       instructor_info: null, curriculum: null,
-      location: null, recruitment_status: 'OPEN'
+      location: null, recruitment_status: 'OPEN',
+      poster_image: '/clubs/poster_harmonics.jpg'
     }
   ];
 
   const insertClub = db.prepare(`
     INSERT INTO clubs (name, icon, icon_color, slogan, category, target_age, target_gender,
       schedule_text, fee_text, max_members, total_sessions, instructor_info, curriculum,
-      location, recruitment_status, external_link, display_order)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      location, recruitment_status, external_link, poster_image, display_order)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   clubs.forEach((c, i) => {
@@ -122,7 +130,8 @@ export function seedDatabase(db: any) {
       c.name, c.icon, c.icon_color, c.slogan, c.category, c.target_age, c.target_gender || null,
       c.schedule_text, c.fee_text, c.max_members || null, c.total_sessions || null,
       c.instructor_info || null, c.curriculum || null,
-      c.location || null, c.recruitment_status, (c as any).external_link || null, i + 1
+      c.location || null, c.recruitment_status, (c as any).external_link || null,
+      (c as any).poster_image || null, i + 1
     );
   });
 

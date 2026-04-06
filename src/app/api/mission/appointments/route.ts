@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     const {
       appointment_type, title, description,
       appointment_date, start_time, location, participants,
-    } = await request.json();
+    } = JSON.parse(await request.text());
 
     if (!appointment_type || !title) {
       return Response.json({ error: '유형과 제목은 필수입니다' }, { status: 400 });

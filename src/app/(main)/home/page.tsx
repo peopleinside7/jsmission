@@ -94,7 +94,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* ── 3. 동아리 포스터 그리드 (2열, 절반 크기) ── */}
+        {/* ── 3. 동아리 포스터 2열 그리드 (여백 포함) ── */}
         <div className="mb-5">
           <div className="flex items-center justify-between px-4 mb-3">
             <h2 className="text-base font-bold text-[#1A1A1A]">선교동아리</h2>
@@ -103,47 +103,48 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {/* 2열 그리드 - 가로 스크롤 */}
-          <div className="px-4 overflow-x-auto scrollbar-hide">
-            <div className="flex gap-2.5 pb-2" style={{ width: `${Math.ceil(clubs.length / 2) * 160 + (Math.ceil(clubs.length / 2) - 1) * 10}px` }}>
-              {Array.from({ length: Math.ceil(clubs.length / 2) }).map((_, colIdx) => (
-                <div key={colIdx} className="flex flex-col gap-2.5 shrink-0" style={{ width: '155px' }}>
-                  {[clubs[colIdx * 2], clubs[colIdx * 2 + 1]].filter(Boolean).map(club => (
-                    <Link
-                      key={club.id}
-                      href={`/clubs/${club.id}`}
-                      className="bg-white rounded-xl border border-[#EEE] shadow-sm overflow-hidden hover:shadow-md transition-shadow"
-                    >
-                      <div
-                        className="w-full h-[120px] flex items-center justify-center overflow-hidden relative"
-                        style={{ backgroundColor: club.icon_color }}
-                      >
-                        {club.poster_image ? (
-                          <Image
-                            src={club.poster_image}
-                            alt={club.name}
-                            fill
-                            className="object-cover"
-                            sizes="155px"
-                          />
-                        ) : (
+          <div className="px-4">
+            <div className="grid grid-cols-2 gap-3">
+              {clubs.map(club => (
+                <Link
+                  key={club.id}
+                  href={`/clubs/${club.id}`}
+                  className="bg-[#1a1a1a] rounded-2xl overflow-hidden hover:shadow-lg transition-shadow"
+                >
+                  {/* 포스터 이미지: 패딩으로 여백 확보 */}
+                  <div className="p-3">
+                    <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-black">
+                      {club.poster_image ? (
+                        <Image
+                          src={club.poster_image}
+                          alt={club.name}
+                          fill
+                          className="object-contain"
+                          sizes="(max-width: 640px) 45vw, 280px"
+                        />
+                      ) : (
+                        <div
+                          className="w-full h-full flex items-center justify-center"
+                          style={{ backgroundColor: club.icon_color }}
+                        >
                           <span className="text-4xl">{club.icon}</span>
-                        )}
-                      </div>
-                      <div className="p-2">
-                        <p className="text-xs font-bold text-[#1A1A1A] truncate">{club.name}</p>
-                        <p className="text-[10px] text-[#999] mt-0.5 truncate">{club.slogan}</p>
-                        <span className={`inline-block mt-1 text-[9px] px-1.5 py-0.5 rounded-full font-medium ${
-                          club.recruitment_status === 'OPEN'
-                            ? 'bg-[#E8F5E9] text-[#1E5631]'
-                            : 'bg-gray-100 text-[#999]'
-                        }`}>
-                          {club.recruitment_status === 'OPEN' ? '모집중' : '마감'}
-                        </span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {/* 하단 정보 */}
+                  <div className="px-3 pb-3">
+                    <p className="text-xs font-bold text-white truncate">{club.name}</p>
+                    <p className="text-[10px] text-white/60 mt-0.5 truncate">{club.slogan}</p>
+                    <span className={`inline-block mt-1.5 text-[9px] px-2 py-0.5 rounded-full font-medium ${
+                      club.recruitment_status === 'OPEN'
+                        ? 'bg-[#1E5631] text-white'
+                        : 'bg-white/20 text-white/60'
+                    }`}>
+                      {club.recruitment_status === 'OPEN' ? '모집중' : '마감'}
+                    </span>
+                  </div>
+                </Link>
               ))}
             </div>
           </div>

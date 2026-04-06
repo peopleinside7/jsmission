@@ -109,6 +109,7 @@ export function seedDatabase(db: any) {
     {
       name: 'JS 하모닉스', icon: '🎵', icon_color: '#EDE7F6',
       slogan: '주성령 ♡ 하나된 하모니로',
+      description: '주성령 가족들의 진심 어린 마음이 모여 조화로운 하모니를 이룹니다. 함께 찬양하고 따뜻한 교제를 나누며, 땅끝까지 복음을 전하는 행복한 동행에 당신을 초대합니다.',
       category: '찬양', target_age: '음악 관심자', target_gender: null,
       schedule_text: '주 1회', fee_text: '별도',
       max_members: null, total_sessions: null,
@@ -119,15 +120,16 @@ export function seedDatabase(db: any) {
   ];
 
   const insertClub = db.prepare(`
-    INSERT INTO clubs (name, icon, icon_color, slogan, category, target_age, target_gender,
+    INSERT INTO clubs (name, icon, icon_color, slogan, description, category, target_age, target_gender,
       schedule_text, fee_text, max_members, total_sessions, instructor_info, curriculum,
       location, recruitment_status, external_link, poster_image, display_order)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   clubs.forEach((c, i) => {
     insertClub.run(
-      c.name, c.icon, c.icon_color, c.slogan, c.category, c.target_age, c.target_gender || null,
+      c.name, c.icon, c.icon_color, c.slogan, (c as any).description || null,
+      c.category, c.target_age, c.target_gender || null,
       c.schedule_text, c.fee_text, c.max_members || null, c.total_sessions || null,
       c.instructor_info || null, c.curriculum || null,
       c.location || null, c.recruitment_status, (c as any).external_link || null,

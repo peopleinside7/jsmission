@@ -170,20 +170,39 @@ function getClubsForDay(day: number, month: number, year: number) {
 function ClubCalendar() {
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const today = now.getDate();
+  const [viewYear, setViewYear] = useState(now.getFullYear());
+  const [viewMonth, setViewMonth] = useState(now.getMonth());
+  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const isCurrentMonth = viewYear === now.getFullYear() && viewMonth === now.getMonth();
+  const today = isCurrentMonth ? now.getDate() : -1;
 
-  const selectedClubs = selectedDay ? getClubsForDay(selectedDay, month, year) : [];
+  const selectedClubs = selectedDay ? getClubsForDay(selectedDay, viewMonth, viewYear) : [];
+
+  const prevMonth = () => {
+    setSelectedDay(null);
+    if (viewMonth === 0) { setViewYear(viewYear - 1); setViewMonth(11); }
+    else setViewMonth(viewMonth - 1);
+  };
+  const nextMonth = () => {
+    setSelectedDay(null);
+    if (viewMonth === 11) { setViewYear(viewYear + 1); setViewMonth(0); }
+    else setViewMonth(viewMonth + 1);
+  };
 
   return (
     <div>
       <h3 className="text-base font-bold text-[#1A1A1A] mb-3">이달의 동아리 일정</h3>
       <div className="card p-4 mb-4">
-        <div className="text-center mb-4">
-          <p className="text-base font-bold text-[#1A1A1A]">{year}년 {month + 1}월</p>
+        {/* 월 이동 헤더 */}
+        <div className="flex items-center justify-between mb-4">
+          <button onClick={prevMonth} className="w-8 h-8 rounded-full hover:bg-[#F5F5F5] flex items-center justify-center">
+            <ChevronRight className="w-5 h-5 text-[#999] rotate-180" />
+          </button>
+          <p className="text-base font-bold text-[#1A1A1A]">{viewYear}년 {viewMonth + 1}월</p>
+          <button onClick={nextMonth} className="w-8 h-8 rounded-full hover:bg-[#F5F5F5] flex items-center justify-center">
+            <ChevronRight className="w-5 h-5 text-[#999]" />
+          </button>
         </div>
         {/* 요일 헤더 */}
         <div className="grid grid-cols-7 gap-1 text-center text-xs mb-2">
@@ -192,29 +211,30 @@ function ClubCalendar() {
           ))}
         </div>
         {/* 날짜 그리드 */}
-        <div className="grid grid-cols-7 gap-1">
-          {Array.from({ length: firstDay }).map((_, i) => <div key={`e${i}`} className="min-h-[72px]" />)}
+        <div className="grid grid-cols-7 gap-0.5">
+          {Array.from({ length: firstDay }).map((_, i) => <div key={`e${i}`} className="min-h-[68px]" />)}
           {Array.from({ length: daysInMonth }).map((_, i) => {
             const day = i + 1;
-            const dow = new Date(year, month, day).getDay();
+            const dow = new Date(viewYear, viewMonth, day).getDay();
             const isToday = day === today;
             const isSelected = day === selectedDay;
-            const clubsOnDay = getClubsForDay(day, month, year);
+            const clubsOnDay = getClubsForDay(day, viewMonth, viewYear);
             return (
               <button
                 key={day}
                 onClick={() => setSelectedDay(selectedDay === day ? null : day)}
-                className={`min-h-[72px] rounded-xl flex flex-col items-center pt-1.5 pb-1 transition-all
-                  ${isSelected ? 'bg-[#E8F5E9] ring-2 ring-[#1E5631]' : isToday ? 'bg-[#1E5631]' : 'hover:bg-[#F5F5F5]'}
+                className={`min-h-[68px] rounded-xl flex flex-col items-center pt-1 pb-0.5 transition-all
+                  ${isSelected ? 'bg-[#E8F5E9] ring-2 ring-[#1E5631]' : 'hover:bg-[#F5F5F5]'}
                 `}
               >
-                <span className={`text-xs font-semibold ${isToday ? 'text-white' : dow === 0 ? 'text-[#E53935]' : dow === 6 ? 'text-[#1E88E5]' : 'text-[#333]'}`}>
+                <span className={`text-[11px] font-semibold relative ${dow === 0 ? 'text-[#E53935]' : dow === 6 ? 'text-[#1E88E5]' : 'text-[#333]'}`}>
                   {day}
+                  {isToday && <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#1E5631] rounded-full" />}
                 </span>
                 {clubsOnDay.length > 0 && (
-                  <div className="flex flex-col gap-[2px] mt-1 items-center">
-                    {clubsOnDay.slice(0, 3).map((c, ci) => (
-                      <div key={ci} className="w-5 h-5 rounded-md flex items-center justify-center text-[10px]" style={{ backgroundColor: c.color }}>
+                  <div className="flex flex-wrap gap-[1px] mt-0.5 justify-center max-w-[36px]">
+                    {clubsOnDay.slice(0, 4).map((c, ci) => (
+                      <div key={ci} className="w-4 h-4 rounded flex items-center justify-center text-[8px]" style={{ backgroundColor: c.color }}>
                         {c.icon}
                       </div>
                     ))}

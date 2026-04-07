@@ -148,12 +148,12 @@ export default function ClubsPage() {
 }
 
 const CLUB_SCHEDULES = [
-  { icon: '🗣️', name: '오물오물 잉글리시', time: '10:00', days: [6], color: '#E8EAF6' }, // 토
-  { icon: '🍙', name: '일본어 오니기리', time: '15:00', days: [6], biweekly: true, color: '#EFEBE9' }, // 격주 토
-  { icon: '⚽', name: 'POWER F.C', time: '15:00~17:00', days: [0], color: '#E3F2FD' }, // 일
-  { icon: '🏃‍♀️', name: '여자 플로우 러닝크루', time: '19:30', days: [2, 4], color: '#E3F2FD' }, // 화,목
-  { icon: '💃', name: '디어댄스', time: '16:00~18:00', days: [6], color: '#FCE4EC' }, // 토
-  { icon: '🎵', name: 'JS 하모닉스', time: '오후', days: [0], color: '#EDE7F6' }, // 일
+  { icon: '🗣️', name: '오물오물 잉글리시', time: '10:00', days: [6], dayText: '매주 토요일 10:00', color: '#E8EAF6' },
+  { icon: '🍙', name: '일본어 오니기리', time: '15:00', days: [6], biweekly: true, dayText: '격주 토요일 15:00', color: '#EFEBE9' },
+  { icon: '⚽', name: 'POWER F.C', time: '15:00~17:00', days: [0], dayText: '매주 일요일 15:00~17:00', color: '#E3F2FD' },
+  { icon: '🏃‍♀️', name: '여자 플로우 러닝크루', time: '19:30', days: [2, 4], dayText: '매주 화,목요일 19:30', color: '#E3F2FD' },
+  { icon: '💃', name: '디어댄스', time: '16:00~18:00', days: [6], dayText: '매주 토요일 16:00~18:00', color: '#FCE4EC' },
+  { icon: '🎵', name: 'JS 하모닉스', time: '오후', days: [0], dayText: '매주 일요일 오후', color: '#EDE7F6' },
 ];
 
 function getClubsForDay(day: number, month: number, year: number) {
@@ -193,7 +193,7 @@ function ClubCalendar() {
         </div>
         {/* 날짜 그리드 */}
         <div className="grid grid-cols-7 gap-1">
-          {Array.from({ length: firstDay }).map((_, i) => <div key={`e${i}`} className="h-14" />)}
+          {Array.from({ length: firstDay }).map((_, i) => <div key={`e${i}`} className="min-h-[72px]" />)}
           {Array.from({ length: daysInMonth }).map((_, i) => {
             const day = i + 1;
             const dow = new Date(year, month, day).getDay();
@@ -204,17 +204,19 @@ function ClubCalendar() {
               <button
                 key={day}
                 onClick={() => setSelectedDay(selectedDay === day ? null : day)}
-                className={`h-14 rounded-lg flex flex-col items-center justify-start pt-1 transition-all relative
+                className={`min-h-[72px] rounded-xl flex flex-col items-center pt-1.5 pb-1 transition-all
                   ${isSelected ? 'bg-[#E8F5E9] ring-2 ring-[#1E5631]' : isToday ? 'bg-[#1E5631]' : 'hover:bg-[#F5F5F5]'}
                 `}
               >
-                <span className={`text-xs font-medium ${isToday ? 'text-white' : dow === 0 ? 'text-[#E53935]' : dow === 6 ? 'text-[#1E88E5]' : 'text-[#333]'}`}>
+                <span className={`text-xs font-semibold ${isToday ? 'text-white' : dow === 0 ? 'text-[#E53935]' : dow === 6 ? 'text-[#1E88E5]' : 'text-[#333]'}`}>
                   {day}
                 </span>
                 {clubsOnDay.length > 0 && (
-                  <div className="flex gap-[1px] mt-0.5 flex-wrap justify-center max-w-[40px]">
+                  <div className="flex flex-col gap-[2px] mt-1 items-center">
                     {clubsOnDay.slice(0, 3).map((c, ci) => (
-                      <span key={ci} className="text-[8px] leading-none">{c.icon}</span>
+                      <div key={ci} className="w-5 h-5 rounded-md flex items-center justify-center text-[10px]" style={{ backgroundColor: c.color }}>
+                        {c.icon}
+                      </div>
                     ))}
                   </div>
                 )}
@@ -248,14 +250,17 @@ function ClubCalendar() {
         </div>
       )}
 
-      {/* 범례 */}
+      {/* 동아리 활동 일정 */}
       <div className="card p-4">
-        <h4 className="text-xs font-bold text-[#999] mb-2">동아리 일정 범례</h4>
-        <div className="grid grid-cols-2 gap-2">
+        <h4 className="text-sm font-bold text-[#1A1A1A] mb-3">동아리 활동 일정</h4>
+        <div className="space-y-2.5">
           {CLUB_SCHEDULES.map((c, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <span className="text-sm">{c.icon}</span>
-              <span className="text-[11px] text-[#666]">{c.name}</span>
+            <div key={i} className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base shrink-0" style={{ backgroundColor: c.color }}>
+                {c.icon}
+              </div>
+              <span className="text-sm font-medium text-[#333] min-w-[100px]">{c.name}</span>
+              <span className="text-xs text-[#888]">{c.dayText}</span>
             </div>
           ))}
         </div>

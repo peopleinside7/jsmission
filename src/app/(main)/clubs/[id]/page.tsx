@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
-import { ChevronLeft, Users, Calendar, MapPin, DollarSign, Lock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Users, Calendar, MapPin, DollarSign, Lock } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -161,6 +161,19 @@ export default function ClubDetailPage() {
               ))}
             </div>
           </div>
+        )}
+
+        {/* 동아리 운영방 입장 */}
+        {isMember && (
+          <Link href={`/clubs/${club.id}/room`} className="block w-full mb-4">
+            <div className="bg-[#1E5631] text-white rounded-2xl p-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-bold">동아리 운영방</p>
+                <p className="text-xs text-white/70 mt-0.5">일정 · 공지 · 대화방 · 자료방 · 신입생</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-white/70" />
+            </div>
+          </Link>
         )}
 
         {/* Apply Button */}

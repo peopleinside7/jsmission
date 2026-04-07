@@ -76,7 +76,7 @@ export default function MissionPage() {
 
       {/* Tabs */}
       <div className="bg-white border-b border-[#EEE] flex">
-        {['대시보드', '노방선교', '동아리 홍보'].map((t, i) => (
+        {['대시보드', '노방 전도', '동아리 홍보'].map((t, i) => (
           <button
             key={t}
             onClick={() => setTab(i)}
@@ -114,7 +114,7 @@ export default function MissionPage() {
             <div className="grid grid-cols-2 gap-3 mb-4">
               <div className="card p-4 text-center">
                 <p className="text-2xl font-bold text-[#1E5631]">{appointments.filter(a => a.appointment_type === 'STREET').length}</p>
-                <p className="text-xs text-[#999]">노방선교 약속</p>
+                <p className="text-xs text-[#999]">노방 전도 약속</p>
               </div>
               <div className="card p-4 text-center">
                 <p className="text-2xl font-bold text-[#FF9800]">{appointments.filter(a => a.appointment_type === 'PROMOTION').length}</p>
@@ -128,7 +128,7 @@ export default function MissionPage() {
               <div key={log.id} className="card p-4 mb-2">
                 <div className="flex items-center gap-2 mb-1">
                   <span className={`text-xs px-2 py-0.5 rounded-full ${log.log_type === 'STREET' ? 'bg-[#E8F5E9] text-[#1E5631]' : 'bg-orange-50 text-[#FF9800]'}`}>
-                    {log.log_type === 'STREET' ? '노방' : '홍보'}
+                    {log.log_type === 'STREET' ? '전도' : '홍보'}
                   </span>
                   <span className="text-xs text-[#999]">{log.user_name}</span>
                 </div>
@@ -143,7 +143,7 @@ export default function MissionPage() {
         {(tab === 1 || tab === 2) && (
           <>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-bold">{tab === 1 ? '노방선교' : '동아리 홍보'}</h3>
+              <h3 className="text-base font-bold">{tab === 1 ? '노방 전도' : '동아리 홍보'}</h3>
               <div className="flex gap-2">
                 <button onClick={() => { setLogType(tab === 1 ? 'STREET' : 'PROMOTION'); setShowLogForm(true); }} className="text-xs bg-[#E8F5E9] text-[#1E5631] px-3 py-1.5 rounded-full">활동기록</button>
                 <button onClick={() => { setApptForm({ ...apptForm, appointment_type: tab === 1 ? 'STREET' : 'PROMOTION' }); setShowCreate(true); }} className="text-xs bg-[#1E5631] text-white px-3 py-1.5 rounded-full flex items-center gap-1"><Plus className="w-3 h-3" /> 약속</button>

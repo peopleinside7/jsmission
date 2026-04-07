@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import Image from 'next/image';
@@ -49,10 +49,19 @@ const menuSections = [
 export default function MyPage() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
+  const [myClubs, setMyClubs] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
   // 최초 전체 펼침
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(
     Object.fromEntries(menuSections.map(s => [s.key, true]))
   );
+
+  useEffect(() => {
+    fetch('/api/notifications').then(r => r.json()).then(d => setNotifications(d.notifications || [])).catch(() => {});
+    fetch('/api/clubs').then(r => r.json()).then(d => {
+      setMyClubs(d.clubs || []);
+    }).catch(() => {});
+  }, []);
 
   const toggleSection = (key: string) => {
     setOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
@@ -91,6 +100,58 @@ export default function MyPage() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* 내가 가입한 동아리 */}
+        <div className="bg-white rounded-2xl p-4 mb-3 border border-[#EEE]">
+          <h3 className="text-sm font-bold text-[#1A1A1A] mb-3">내가 가입한 동아리</h3>
+          {myClubs.length === 0 ? (
+            <p className="text-xs text-[#999]">가입한 동아리가 없습니다</p>
+          ) : (
+            <div className="space-y-2">
+              {myClubs.slice(0, 5).map((c: any) => (
+                <Link key={c.id} href={`/clubs/${c.id}`} className="flex items-center gap-2 py-1">
+                  <span className="text-lg">{c.icon}</span>
+                  <span className="text-sm text-[#555]">{c.name}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* 알림 */}
+        <div className="bg-white rounded-2xl p-4 mb-3 border border-[#EEE]">
+          <h3 className="text-sm font-bold text-[#1A1A1A] mb-3 flex items-center gap-2">
+            알림
+          </h3>
+          {notifications.length === 0 ? (
+            <div className="space-y-2">
+              <div className="flex items-start gap-2 py-2 border-b border-[#F5F5F5]">
+                <span className="text-xs text-[#1E5631] mt-0.5">●</span>
+                <p className="text-xs text-[#555]">내가 작성한 글에 댓글이 작성되었습니다.</p>
+              </div>
+              <div className="flex items-start gap-2 py-2 border-b border-[#F5F5F5]">
+                <span className="text-xs text-[#1E5631] mt-0.5">●</span>
+                <p className="text-xs text-[#555]">내가 가입한 동아리에 새글이 올라왔습니다.</p>
+              </div>
+              <div className="flex items-start gap-2 py-2">
+                <span className="text-xs text-[#1E5631] mt-0.5">●</span>
+                <p className="text-xs text-[#555]">선교 참여 신청이 승인되었습니다.</p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {notifications.map((n: any) => (
+                <div key={n.id} className="flex items-start gap-2 py-2 border-b border-[#F5F5F5] last:border-0">
+                  <span className="text-xs text-[#1E5631] mt-0.5">●</span>
+                  <div>
+                    <p className="text-xs text-[#555]">{n.message || n.title}</p>
+                    <p className="text-[10px] text-[#BDBDBD] mt-0.5">{new Date(n.created_at).toLocaleDateString('ko-KR')}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Admin Link */}

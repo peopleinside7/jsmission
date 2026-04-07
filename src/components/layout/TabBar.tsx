@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, Users, Bell, Menu } from 'lucide-react';
+import { Home, BookOpen, Users, User, Menu } from 'lucide-react';
 
 interface TabItem {
   href: string;
@@ -17,7 +17,7 @@ const leftTabs: TabItem[] = [
 ];
 
 const rightTabs: TabItem[] = [
-  { href: '/newcomers', label: '알림', icon: <Bell size={22} />, match: ['/newcomers', '/boards'] },
+  { href: '/mypage', label: 'My', icon: <User size={22} />, match: ['/newcomers', '/boards'] },
   { href: '/mypage', label: '전체메뉴', icon: <Menu size={22} />, match: ['/mypage', '/settings', '/feedback', '/resources'] },
 ];
 

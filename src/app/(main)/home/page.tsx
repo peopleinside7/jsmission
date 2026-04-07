@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Bell, Menu, ChevronRight } from 'lucide-react';
+import { Menu, ChevronRight } from 'lucide-react';
 
 const CATEGORY_CHIPS = [
   { label: '선교동아리', href: '/clubs' },
@@ -54,9 +54,8 @@ export default function HomePage() {
           {/* 우측: 사용자명 + 알림 + 메뉴 */}
           <div className="flex items-center gap-3">
             <span className="text-white/90 text-xs font-medium">{user?.name} 회원님</span>
-            <Link href="/mypage" className="relative">
-              <Bell className="w-5 h-5 text-white/90" />
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#E53935] rounded-full" />
+            <Link href="/mypage" className="text-white/90 text-xs font-medium bg-white/20 px-2.5 py-1 rounded-full">
+              My
             </Link>
             <Link href="/mypage">
               <Menu className="w-5 h-5 text-white/90" />

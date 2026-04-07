@@ -11,7 +11,7 @@ interface Club {
   schedule_text: string; target_age: string; newcomer_count: number;
 }
 
-const TABS = ['소개', '랭킹', '신청', '활동', '기도방'];
+const TABS = ['소개', '랭킹', '신청', '일정', '기도방'];
 const CATEGORIES = ['전체', '교육', '스포츠', '문화', '대학사역', '찬양', '기타'];
 
 export default function ClubsPage() {
@@ -137,11 +137,66 @@ export default function ClubsPage() {
           </div>
         )}
 
-        {/* Tab 3: 활동 */}
+        {/* Tab 3: 일정 */}
         {tab === 3 && (
-          <div className="text-center py-10">
-            <p className="text-sm text-[#999]">이달의 동아리 활동을 확인하세요</p>
-            <p className="text-xs text-[#BDBDBD] mt-2">각 동아리 운영방에서 일정을 확인할 수 있습니다</p>
+          <div>
+            <h3 className="text-base font-bold text-[#1A1A1A] mb-3">이달의 동아리 일정</h3>
+            {/* Calendar header */}
+            <div className="card p-4 mb-4">
+              <div className="text-center mb-3">
+                <p className="text-sm font-bold">{new Date().getFullYear()}년 {new Date().getMonth() + 1}월</p>
+              </div>
+              <div className="grid grid-cols-7 gap-1 text-center text-xs">
+                {['일','월','화','수','목','금','토'].map(d => (
+                  <div key={d} className={`py-1 font-semibold ${d === '일' ? 'text-[#E53935]' : d === '토' ? 'text-[#1E88E5]' : 'text-[#666]'}`}>{d}</div>
+                ))}
+                {(() => {
+                  const now = new Date();
+                  const year = now.getFullYear();
+                  const month = now.getMonth();
+                  const firstDay = new Date(year, month, 1).getDay();
+                  const daysInMonth = new Date(year, month + 1, 0).getDate();
+                  const cells = [];
+                  for (let i = 0; i < firstDay; i++) cells.push(<div key={`e${i}`} />);
+                  for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(year, month, day);
+                    const dow = date.getDay();
+                    const isToday = day === now.getDate();
+                    const hasSat = dow === 6;
+                    const hasSun = dow === 0;
+                    const hasTueOrThu = dow === 2 || dow === 4;
+                    const hasActivity = hasSat || hasSun || hasTueOrThu;
+                    cells.push(
+                      <div key={day} className={`py-1.5 rounded-lg relative ${isToday ? 'bg-[#1E5631] text-white font-bold' : dow === 0 ? 'text-[#E53935]' : dow === 6 ? 'text-[#1E88E5]' : 'text-[#333]'}`}>
+                        {day}
+                        {hasActivity && !isToday && <div className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#1E5631] rounded-full" />}
+                      </div>
+                    );
+                  }
+                  return cells;
+                })()}
+              </div>
+            </div>
+            {/* Schedule list */}
+            <div className="space-y-2">
+              {[
+                { icon: '\uD83D\uDDE3\uFE0F', name: '오물오물 잉글리시', schedule: '매주 토요일 10:00', color: '#E8EAF6' },
+                { icon: '\uD83C\uDF59', name: '일본어 오니기리', schedule: '격주 토요일 15:00', color: '#EFEBE9' },
+                { icon: '\u26BD', name: 'POWER F.C', schedule: '매주 일요일 15:00~17:00', color: '#E3F2FD' },
+                { icon: '\uD83C\uDFC3\u200D\u2640\uFE0F', name: '여자 플로우 러닝크루', schedule: '매주 화,목 19:30', color: '#E3F2FD' },
+                { icon: '\uD83D\uDC83', name: '디어댄스', schedule: '매주 토요일 16:00~18:00', color: '#FCE4EC' },
+                { icon: '\uD83E\uDDED', name: '캠퍼스 나침반', schedule: '상시', color: '#E8F5E9' },
+                { icon: '\uD83C\uDFB5', name: 'JS 하모닉스', schedule: '매주 일요일', color: '#EDE7F6' },
+              ].map(item => (
+                <div key={item.name} className="card p-3 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style={{ backgroundColor: item.color }}>{item.icon}</div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-[#333]">{item.name}</p>
+                    <p className="text-xs text-[#999]">{item.schedule}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

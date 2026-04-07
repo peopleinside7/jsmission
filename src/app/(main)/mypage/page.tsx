@@ -72,6 +72,7 @@ export default function MyPage() {
         <div className="flex items-center gap-3">
           <Link href="/settings"><Settings className="w-5 h-5 text-white/80" /></Link>
           <button onClick={() => router.back()}><X className="w-5 h-5 text-white/80" /></button>
+          <Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" />
         </div>
       </div>
 

@@ -155,8 +155,10 @@ export default function MyPage() {
 
         {/* Footer */}
         <div className="text-center py-6 text-[10px] text-[#BDBDBD] space-y-1">
-          <p>안산주성령교회 JS MISSION</p>
-          <p>COPYRIGHT &copy; JS MISSION 2025 All RIGHT RESERVED.</p>
+          <p>안산주성령교회 문화선교 플랫폼</p>
+          <p>Developed by Praise Hong</p>
+          <p>https://jsmission.vercel.app</p>
+          <p className="mt-2 text-[#D0D0D0]">COPYRIGHT &copy; 2025 JS MISSION. All Rights Reserved.</p>
         </div>
       </div>
     </div>

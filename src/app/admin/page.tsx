@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Users, BookOpen, Target, TrendingUp } from 'lucide-react';
 
 const STAGE_COLORS: Record<string, string> = {
-  ATTEMPT: '#4CAF50', PRELIM: '#FF9800', GOSPEL: '#E53935', WORSHIP: '#FF9800', COMPLETE: '#1E5631',
+  ATTEMPT: '#5B9A6F', PRELIM: '#7BAA8E', GOSPEL: '#2D7A3A', WORSHIP: '#3D8B5A', COMPLETE: '#1E5631',
 };
 const STAGE_LABELS: Record<string, string> = {
   ATTEMPT: '시도', PRELIM: '전초', GOSPEL: '말씀연결', WORSHIP: '예배참석', COMPLETE: '수료',

@@ -202,6 +202,14 @@ export default function LoginPage() {
           <p className="text-xs text-[#666] text-center">Admin: 관리자 / admin1234</p>
           <p className="text-xs text-[#666] text-center">User: 김성도 / test1234</p>
         </div>
+
+        {/* Footer */}
+        <div className="mt-10 pb-6 text-center space-y-1">
+          <p className="text-[10px] text-[#BDBDBD]">안산주성령교회 문화선교 플랫폼</p>
+          <p className="text-[10px] text-[#BDBDBD]">Developed by Praise Hong</p>
+          <p className="text-[10px] text-[#BDBDBD]">https://jsmission.vercel.app</p>
+          <p className="text-[10px] text-[#D0D0D0] mt-2">COPYRIGHT &copy; 2025 JS MISSION. All Rights Reserved.</p>
+        </div>
       </div>
     </div>
   );

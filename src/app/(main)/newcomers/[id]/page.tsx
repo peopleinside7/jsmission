@@ -6,10 +6,10 @@ import { ChevronLeft, Phone, Calendar, User } from 'lucide-react';
 import Image from 'next/image';
 
 const STAGES = [
-  { key: 'ATTEMPT', label: '시도', icon: '🎯', color: '#4CAF50' },
-  { key: 'PRELIM', label: '전초', icon: '☕', color: '#FF9800' },
-  { key: 'GOSPEL', label: '말씀연결', icon: '📖', color: '#E53935' },
-  { key: 'WORSHIP', label: '예배참석', icon: '⛪', color: '#FF9800' },
+  { key: 'ATTEMPT', label: '시도', icon: '🎯', color: '#5B9A6F' },
+  { key: 'PRELIM', label: '전초', icon: '☕', color: '#7BAA8E' },
+  { key: 'GOSPEL', label: '말씀연결', icon: '📖', color: '#2D7A3A' },
+  { key: 'WORSHIP', label: '예배참석', icon: '⛪', color: '#3D8B5A' },
   { key: 'COMPLETE', label: '수료', icon: '🎓', color: '#1E5631' },
 ];
 

@@ -6,12 +6,12 @@ import Image from 'next/image';
 import { Plus, Search } from 'lucide-react';
 
 const STAGE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  ATTEMPT: { label: '시도', color: '#4CAF50', bg: '#E8F5E9' },
-  PRELIM: { label: '전초', color: '#FF9800', bg: '#FFF3E0' },
-  GOSPEL: { label: '말씀연결', color: '#E53935', bg: '#FFEBEE' },
-  WORSHIP: { label: '예배참석', color: '#FF9800', bg: '#FFF3E0' },
-  COMPLETE: { label: '수료', color: '#1E5631', bg: '#E8F5E9' },
-  LOST: { label: '이탈', color: '#999', bg: '#F5F5F5' },
+  ATTEMPT: { label: '시도', color: '#5B9A6F', bg: '#EDF5F0' },
+  PRELIM: { label: '전초', color: '#7BAA8E', bg: '#F0F7F3' },
+  GOSPEL: { label: '말씀연결', color: '#2D7A3A', bg: '#E8F5E9' },
+  WORSHIP: { label: '예배참석', color: '#3D8B5A', bg: '#EAF4ED' },
+  COMPLETE: { label: '수료', color: '#1E5631', bg: '#E3F0E7' },
+  LOST: { label: '이탈', color: '#AAAAAA', bg: '#F5F5F5' },
 };
 
 export default function NewcomersPage() {

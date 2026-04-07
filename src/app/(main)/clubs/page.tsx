@@ -138,70 +138,127 @@ export default function ClubsPage() {
         )}
 
         {/* Tab 3: 일정 */}
-        {tab === 3 && (
-          <div>
-            <h3 className="text-base font-bold text-[#1A1A1A] mb-3">이달의 동아리 일정</h3>
-            {/* Calendar header */}
-            <div className="card p-4 mb-4">
-              <div className="text-center mb-3">
-                <p className="text-sm font-bold">{new Date().getFullYear()}년 {new Date().getMonth() + 1}월</p>
-              </div>
-              <div className="grid grid-cols-7 gap-1 text-center text-xs">
-                {['일','월','화','수','목','금','토'].map(d => (
-                  <div key={d} className={`py-1 font-semibold ${d === '일' ? 'text-[#E53935]' : d === '토' ? 'text-[#1E88E5]' : 'text-[#666]'}`}>{d}</div>
-                ))}
-                {(() => {
-                  const now = new Date();
-                  const year = now.getFullYear();
-                  const month = now.getMonth();
-                  const firstDay = new Date(year, month, 1).getDay();
-                  const daysInMonth = new Date(year, month + 1, 0).getDate();
-                  const cells = [];
-                  for (let i = 0; i < firstDay; i++) cells.push(<div key={`e${i}`} />);
-                  for (let day = 1; day <= daysInMonth; day++) {
-                    const date = new Date(year, month, day);
-                    const dow = date.getDay();
-                    const isToday = day === now.getDate();
-                    const hasSat = dow === 6;
-                    const hasSun = dow === 0;
-                    const hasTueOrThu = dow === 2 || dow === 4;
-                    const hasActivity = hasSat || hasSun || hasTueOrThu;
-                    cells.push(
-                      <div key={day} className={`py-1.5 rounded-lg relative ${isToday ? 'bg-[#1E5631] text-white font-bold' : dow === 0 ? 'text-[#E53935]' : dow === 6 ? 'text-[#1E88E5]' : 'text-[#333]'}`}>
-                        {day}
-                        {hasActivity && !isToday && <div className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#1E5631] rounded-full" />}
-                      </div>
-                    );
-                  }
-                  return cells;
-                })()}
-              </div>
-            </div>
-            {/* Schedule list */}
+        {tab === 3 && <ClubCalendar />}
+
+        {/* Tab 4: 기도방 */}
+        {tab === 4 && <PrayerRoom />}
+      </div>
+    </div>
+  );
+}
+
+const CLUB_SCHEDULES = [
+  { icon: '🗣️', name: '오물오물 잉글리시', time: '10:00', days: [6], color: '#E8EAF6' }, // 토
+  { icon: '🍙', name: '일본어 오니기리', time: '15:00', days: [6], biweekly: true, color: '#EFEBE9' }, // 격주 토
+  { icon: '⚽', name: 'POWER F.C', time: '15:00~17:00', days: [0], color: '#E3F2FD' }, // 일
+  { icon: '🏃‍♀️', name: '여자 플로우 러닝크루', time: '19:30', days: [2, 4], color: '#E3F2FD' }, // 화,목
+  { icon: '💃', name: '디어댄스', time: '16:00~18:00', days: [6], color: '#FCE4EC' }, // 토
+  { icon: '🎵', name: 'JS 하모닉스', time: '오후', days: [0], color: '#EDE7F6' }, // 일
+];
+
+function getClubsForDay(day: number, month: number, year: number) {
+  const date = new Date(year, month, day);
+  const dow = date.getDay();
+  const weekNum = Math.ceil(day / 7);
+  return CLUB_SCHEDULES.filter(c => {
+    if (!c.days.includes(dow)) return false;
+    if (c.biweekly && weekNum % 2 === 0) return false;
+    return true;
+  });
+}
+
+function ClubCalendar() {
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const today = now.getDate();
+
+  const selectedClubs = selectedDay ? getClubsForDay(selectedDay, month, year) : [];
+
+  return (
+    <div>
+      <h3 className="text-base font-bold text-[#1A1A1A] mb-3">이달의 동아리 일정</h3>
+      <div className="card p-4 mb-4">
+        <div className="text-center mb-4">
+          <p className="text-base font-bold text-[#1A1A1A]">{year}년 {month + 1}월</p>
+        </div>
+        {/* 요일 헤더 */}
+        <div className="grid grid-cols-7 gap-1 text-center text-xs mb-2">
+          {['일','월','화','수','목','금','토'].map(d => (
+            <div key={d} className={`py-1 font-bold ${d === '일' ? 'text-[#E53935]' : d === '토' ? 'text-[#1E88E5]' : 'text-[#666]'}`}>{d}</div>
+          ))}
+        </div>
+        {/* 날짜 그리드 */}
+        <div className="grid grid-cols-7 gap-1">
+          {Array.from({ length: firstDay }).map((_, i) => <div key={`e${i}`} className="h-14" />)}
+          {Array.from({ length: daysInMonth }).map((_, i) => {
+            const day = i + 1;
+            const dow = new Date(year, month, day).getDay();
+            const isToday = day === today;
+            const isSelected = day === selectedDay;
+            const clubsOnDay = getClubsForDay(day, month, year);
+            return (
+              <button
+                key={day}
+                onClick={() => setSelectedDay(selectedDay === day ? null : day)}
+                className={`h-14 rounded-lg flex flex-col items-center justify-start pt-1 transition-all relative
+                  ${isSelected ? 'bg-[#E8F5E9] ring-2 ring-[#1E5631]' : isToday ? 'bg-[#1E5631]' : 'hover:bg-[#F5F5F5]'}
+                `}
+              >
+                <span className={`text-xs font-medium ${isToday ? 'text-white' : dow === 0 ? 'text-[#E53935]' : dow === 6 ? 'text-[#1E88E5]' : 'text-[#333]'}`}>
+                  {day}
+                </span>
+                {clubsOnDay.length > 0 && (
+                  <div className="flex gap-[1px] mt-0.5 flex-wrap justify-center max-w-[40px]">
+                    {clubsOnDay.slice(0, 3).map((c, ci) => (
+                      <span key={ci} className="text-[8px] leading-none">{c.icon}</span>
+                    ))}
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 선택한 날짜 상세 */}
+      {selectedDay && (
+        <div className="card p-4 mb-4">
+          <h4 className="text-sm font-bold text-[#1A1A1A] mb-3">{month + 1}월 {selectedDay}일 일정</h4>
+          {selectedClubs.length === 0 ? (
+            <p className="text-xs text-[#999] text-center py-4">이 날에는 예정된 활동이 없습니다</p>
+          ) : (
             <div className="space-y-2">
-              {[
-                { icon: '\uD83D\uDDE3\uFE0F', name: '오물오물 잉글리시', schedule: '매주 토요일 10:00', color: '#E8EAF6' },
-                { icon: '\uD83C\uDF59', name: '일본어 오니기리', schedule: '격주 토요일 15:00', color: '#EFEBE9' },
-                { icon: '\u26BD', name: 'POWER F.C', schedule: '매주 일요일 15:00~17:00', color: '#E3F2FD' },
-                { icon: '\uD83C\uDFC3\u200D\u2640\uFE0F', name: '여자 플로우 러닝크루', schedule: '매주 화,목 19:30', color: '#E3F2FD' },
-                { icon: '\uD83D\uDC83', name: '디어댄스', schedule: '매주 토요일 16:00~18:00', color: '#FCE4EC' },
-                { icon: '\uD83E\uDDED', name: '캠퍼스 나침반', schedule: '상시', color: '#E8F5E9' },
-                { icon: '\uD83C\uDFB5', name: 'JS 하모닉스', schedule: '매주 일요일', color: '#EDE7F6' },
-              ].map(item => (
-                <div key={item.name} className="card p-3 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style={{ backgroundColor: item.color }}>{item.icon}</div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-[#333]">{item.name}</p>
-                    <p className="text-xs text-[#999]">{item.schedule}</p>
+              {selectedClubs.map((c, i) => (
+                <div key={i} className="flex items-center gap-3 p-3 bg-[#FAFAFA] rounded-xl">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0" style={{ backgroundColor: c.color }}>
+                    {c.icon}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#333]">{c.name}</p>
+                    <p className="text-xs text-[#1E5631] font-medium">{c.time}</p>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
+      )}
 
-        {/* Tab 4: 기도방 */}
-        {tab === 4 && <PrayerRoom />}
+      {/* 범례 */}
+      <div className="card p-4">
+        <h4 className="text-xs font-bold text-[#999] mb-2">동아리 일정 범례</h4>
+        <div className="grid grid-cols-2 gap-2">
+          {CLUB_SCHEDULES.map((c, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <span className="text-sm">{c.icon}</span>
+              <span className="text-[11px] text-[#666]">{c.name}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

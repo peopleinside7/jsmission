@@ -87,7 +87,7 @@ export default function MyPage() {
 
       <div className="max-w-[640px] mx-auto px-4 pt-4">
         {/* Profile */}
-        <div className="bg-white rounded-2xl p-5 mb-4 border border-[#EEE]">
+        <div className="bg-white rounded-2xl p-5 mb-3 border border-[#EEE]">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 bg-[#E8F5E9] rounded-full flex items-center justify-center shrink-0">
               <Image src="/logo_r.png" alt="profile" width={40} height={40} className="rounded-full" />
@@ -100,58 +100,6 @@ export default function MyPage() {
               </p>
             </div>
           </div>
-        </div>
-
-        {/* 내가 가입한 동아리 */}
-        <div className="bg-white rounded-2xl p-4 mb-3 border border-[#EEE]">
-          <h3 className="text-sm font-bold text-[#1A1A1A] mb-3">내가 가입한 동아리</h3>
-          {myClubs.length === 0 ? (
-            <p className="text-xs text-[#999]">가입한 동아리가 없습니다</p>
-          ) : (
-            <div className="space-y-2">
-              {myClubs.slice(0, 5).map((c: any) => (
-                <Link key={c.id} href={`/clubs/${c.id}`} className="flex items-center gap-2 py-1">
-                  <span className="text-lg">{c.icon}</span>
-                  <span className="text-sm text-[#555]">{c.name}</span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* 알림 */}
-        <div className="bg-white rounded-2xl p-4 mb-3 border border-[#EEE]">
-          <h3 className="text-sm font-bold text-[#1A1A1A] mb-3 flex items-center gap-2">
-            알림
-          </h3>
-          {notifications.length === 0 ? (
-            <div className="space-y-2">
-              <div className="flex items-start gap-2 py-2 border-b border-[#F5F5F5]">
-                <span className="text-xs text-[#1E5631] mt-0.5">●</span>
-                <p className="text-xs text-[#555]">내가 작성한 글에 댓글이 작성되었습니다.</p>
-              </div>
-              <div className="flex items-start gap-2 py-2 border-b border-[#F5F5F5]">
-                <span className="text-xs text-[#1E5631] mt-0.5">●</span>
-                <p className="text-xs text-[#555]">내가 가입한 동아리에 새글이 올라왔습니다.</p>
-              </div>
-              <div className="flex items-start gap-2 py-2">
-                <span className="text-xs text-[#1E5631] mt-0.5">●</span>
-                <p className="text-xs text-[#555]">선교 참여 신청이 승인되었습니다.</p>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {notifications.map((n: any) => (
-                <div key={n.id} className="flex items-start gap-2 py-2 border-b border-[#F5F5F5] last:border-0">
-                  <span className="text-xs text-[#1E5631] mt-0.5">●</span>
-                  <div>
-                    <p className="text-xs text-[#555]">{n.message || n.title}</p>
-                    <p className="text-[10px] text-[#BDBDBD] mt-0.5">{new Date(n.created_at).toLocaleDateString('ko-KR')}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Admin Link */}

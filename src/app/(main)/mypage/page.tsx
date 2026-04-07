@@ -5,170 +5,117 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-  Settings, LogOut, ChevronUp, ChevronDown, ExternalLink, X
-} from 'lucide-react';
-
-const menuSections = [
-  {
-    key: 'mission',
-    label: '선교',
-    items: [
-      { label: '선교동아리', href: '/clubs' },
-      { label: '선교일지', href: '/mission' },
-      { label: '신입생상황', href: '/newcomers' },
-    ]
-  },
-  {
-    key: 'boards',
-    label: '게시판',
-    items: [
-      { label: '공지사항', href: '/boards/NOTICE' },
-      { label: '생명의 말씀', href: '/boards/SERMON' },
-      { label: '자유게시판', href: '/boards/FREE' },
-    ]
-  },
-  {
-    key: 'community',
-    label: '커뮤니티',
-    items: [
-      { label: 'Feedback', href: '/feedback' },
-      { label: '자료실', href: '/resources' },
-    ]
-  },
-  {
-    key: 'mypage',
-    label: '마이페이지',
-    items: [
-      { label: '내 정보 관리', href: '/settings' },
-      { label: '비밀번호 변경', href: '/settings' },
-    ]
-  },
-];
+import { ChevronLeft, Settings, Bell, ChevronRight } from 'lucide-react';
 
 export default function MyPage() {
   const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const [myClubs, setMyClubs] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
-  // 최초 전체 펼침
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>(
-    Object.fromEntries(menuSections.map(s => [s.key, true]))
-  );
 
   useEffect(() => {
+    fetch('/api/clubs').then(r => r.json()).then(d => setMyClubs(d.clubs || [])).catch(() => {});
     fetch('/api/notifications').then(r => r.json()).then(d => setNotifications(d.notifications || [])).catch(() => {});
-    fetch('/api/clubs').then(r => r.json()).then(d => {
-      setMyClubs(d.clubs || []);
-    }).catch(() => {});
   }, []);
-
-  const toggleSection = (key: string) => {
-    setOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
-    logout();
-    router.replace('/login');
-  };
 
   return (
     <div className="pb-24 bg-[#F5F5F5] min-h-screen">
       {/* Header */}
-      <div className="bg-[#1E5631] px-4 py-3 flex items-center justify-between sticky top-0 z-50">
-        <h1 className="text-base font-bold text-white">전체메뉴</h1>
-        <div className="flex items-center gap-3">
-          <Link href="/settings"><Settings className="w-5 h-5 text-white/80" /></Link>
-          <button onClick={() => router.back()}><X className="w-5 h-5 text-white/80" /></button>
-          <Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" />
-        </div>
+      <div className="bg-[#1E5631] px-4 py-3 flex items-center gap-3 sticky top-0 z-50">
+        <button onClick={() => router.back()}><ChevronLeft className="w-6 h-6 text-white" /></button>
+        <h1 className="text-base font-bold text-white flex-1">My</h1>
+        <Link href="/settings"><Settings className="w-5 h-5 text-white/80" /></Link>
+        <Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" />
       </div>
 
       <div className="max-w-[640px] mx-auto px-4 pt-4">
-        {/* Profile */}
-        <div className="bg-white rounded-2xl p-5 mb-3 border border-[#EEE]">
+        {/* 1. 나의 정보 */}
+        <div className="bg-white rounded-2xl p-5 mb-4 border border-[#EEE]">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-[#E8F5E9] rounded-full flex items-center justify-center shrink-0">
-              <Image src="/logo_r.png" alt="profile" width={40} height={40} className="rounded-full" />
+            <div className="w-16 h-16 bg-[#E8F5E9] rounded-full flex items-center justify-center shrink-0">
+              <Image src="/logo_r.png" alt="profile" width={44} height={44} className="rounded-full" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-lg font-bold text-[#1A1A1A]">{user?.name}</p>
-              <p className="text-xs text-[#999]">{user?.phone}</p>
+              <p className="text-xl font-bold text-[#1A1A1A]">{user?.name}</p>
+              <p className="text-xs text-[#999] mt-0.5">{user?.phone}</p>
               <p className="text-xs text-[#4CAF50] mt-0.5">
                 {user?.role === 'ADMIN' ? '관리자' : user?.role === 'CLUB_ADMIN' ? '동아리 관리자' : '일반 회원'}
               </p>
             </div>
+            <Link href="/settings" className="text-xs text-[#999] bg-[#F5F5F5] px-3 py-1.5 rounded-full">
+              내 정보
+            </Link>
           </div>
         </div>
 
-        {/* Admin Link */}
-        {user?.role === 'ADMIN' && (
-          <Link href="/admin" className="block bg-[#1E5631] rounded-2xl p-4 mb-4 text-white">
-            <p className="text-sm font-semibold">Admin 대시보드</p>
-            <p className="text-xs text-white/70">PC에서 접속해주세요</p>
-          </Link>
-        )}
-
-        {/* Menu Sections - 2열 그리드, 접기/펴기 */}
-        {menuSections.map(section => (
-          <div key={section.key} className="bg-white rounded-2xl mb-3 border border-[#EEE] overflow-hidden">
-            {/* Section Header */}
-            <button
-              onClick={() => toggleSection(section.key)}
-              className="w-full px-5 py-4 flex items-center justify-between"
-            >
-              <h3 className="text-base font-bold text-[#1A1A1A]">{section.label}</h3>
-              {openSections[section.key]
-                ? <ChevronUp className="w-5 h-5 text-[#999]" />
-                : <ChevronDown className="w-5 h-5 text-[#999]" />
-              }
-            </button>
-
-            {/* Section Items - 2열 그리드 */}
-            {openSections[section.key] && (
-              <div className="px-5 pb-4 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-[#F5F5F5] pt-3">
-                {section.items.map(item => (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className="text-sm text-[#555] py-1.5 hover:text-[#1E5631] transition-colors"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-
-        {/* Family Site */}
-        <div className="bg-white rounded-2xl mb-3 border border-[#EEE] overflow-hidden">
-          <div className="px-5 py-4">
-            <h3 className="text-base font-bold text-[#1A1A1A] flex items-center gap-2">
-              <ExternalLink className="w-4 h-4" /> Family Site
-            </h3>
-          </div>
-          <div className="px-5 pb-4 border-t border-[#F5F5F5] pt-3 space-y-2">
-            <a href="https://www.example.com" target="_blank" rel="noopener"
-              className="flex items-center gap-2 text-sm text-[#555] py-1">
-              ⛪ 안산주성령교회 <ExternalLink className="w-3 h-3 text-[#BDBDBD]" />
-            </a>
-          </div>
+        {/* 2. 내가 가입한 동아리 */}
+        <div className="bg-white rounded-2xl p-4 mb-4 border border-[#EEE]">
+          <h3 className="text-sm font-bold text-[#1A1A1A] mb-3 flex items-center gap-2">
+            🏠 내가 가입한 동아리
+          </h3>
+          {myClubs.length === 0 ? (
+            <div className="text-center py-6">
+              <p className="text-xs text-[#999]">가입한 동아리가 없습니다</p>
+              <Link href="/clubs" className="inline-block mt-2 text-xs text-[#1E5631] font-medium">
+                동아리 둘러보기 →
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {myClubs.map((c: any) => (
+                <Link key={c.id} href={`/clubs/${c.id}`} className="flex items-center gap-3 py-2.5 border-b border-[#F5F5F5] last:border-0">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0" style={{ backgroundColor: c.icon_color }}>
+                    {c.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#333] truncate">{c.name}</p>
+                    <p className="text-[10px] text-[#999]">{c.schedule_text}</p>
+                  </div>
+                  <span className={`text-[9px] px-2 py-0.5 rounded-full ${c.recruitment_status === 'OPEN' ? 'bg-[#E8F5E9] text-[#1E5631]' : 'bg-gray-100 text-[#999]'}`}>
+                    {c.recruitment_status === 'OPEN' ? '모집중' : '마감'}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Logout */}
-        <button onClick={handleLogout} className="w-full bg-white rounded-2xl p-4 mb-4 border border-[#EEE] flex items-center gap-3 text-[#E53935]">
-          <LogOut className="w-5 h-5" />
-          <span className="text-sm font-medium">로그아웃</span>
-        </button>
-
-        {/* Footer */}
-        <div className="text-center py-6 text-[10px] text-[#BDBDBD] space-y-1">
-          <p>안산주성령교회 문화선교 플랫폼</p>
-          <p>Developed by Praise Hong</p>
-          <p>https://jsmission.vercel.app</p>
-          <p className="mt-2 text-[#D0D0D0]">COPYRIGHT &copy; 2025 JS MISSION. All Rights Reserved.</p>
+        {/* 3. 알림 */}
+        <div className="bg-white rounded-2xl p-4 mb-4 border border-[#EEE]">
+          <h3 className="text-sm font-bold text-[#1A1A1A] mb-3 flex items-center gap-2">
+            <Bell className="w-4 h-4 text-[#1E5631]" /> 알림
+          </h3>
+          {notifications.length === 0 ? (
+            <div className="space-y-0">
+              {[
+                { msg: '내가 작성한 글에 댓글이 작성되었습니다.', time: '방금 전' },
+                { msg: '내가 가입한 동아리에 새글이 올라왔습니다.', time: '1시간 전' },
+                { msg: '선교 참여 신청이 승인되었습니다.', time: '어제' },
+                { msg: '오물오물 잉글리시 동아리 모임이 내일 예정되어 있습니다.', time: '어제' },
+                { msg: '피드백에 관리자 답변이 등록되었습니다.', time: '2일 전' },
+              ].map((n, i) => (
+                <div key={i} className="flex items-start gap-2.5 py-3 border-b border-[#F5F5F5] last:border-0">
+                  <div className="w-2 h-2 bg-[#1E5631] rounded-full mt-1.5 shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-xs text-[#444] leading-relaxed">{n.msg}</p>
+                    <p className="text-[10px] text-[#BDBDBD] mt-0.5">{n.time}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-0">
+              {notifications.map((n: any) => (
+                <div key={n.id} className="flex items-start gap-2.5 py-3 border-b border-[#F5F5F5] last:border-0">
+                  <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${n.is_read ? 'bg-[#BDBDBD]' : 'bg-[#1E5631]'}`} />
+                  <div className="flex-1">
+                    <p className="text-xs text-[#444] leading-relaxed">{n.message || n.title}</p>
+                    <p className="text-[10px] text-[#BDBDBD] mt-0.5">{new Date(n.created_at).toLocaleDateString('ko-KR')}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

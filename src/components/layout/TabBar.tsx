@@ -17,8 +17,8 @@ const leftTabs: TabItem[] = [
 ];
 
 const rightTabs: TabItem[] = [
-  { href: '/mypage', label: 'My', icon: <User size={22} />, match: ['/newcomers', '/boards'] },
-  { href: '/mypage', label: '전체메뉴', icon: <Menu size={22} />, match: ['/mypage', '/settings', '/feedback', '/resources'] },
+  { href: '/mypage', label: 'My', icon: <User size={22} />, match: ['/mypage'] },
+  { href: '/menu', label: '전체메뉴', icon: <Menu size={22} />, match: ['/menu', '/settings', '/feedback', '/resources', '/newcomers', '/boards'] },
 ];
 
 export default function TabBar() {

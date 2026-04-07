@@ -57,7 +57,7 @@ export default function HomePage() {
             <Link href="/mypage" className="text-white/90 text-xs font-medium bg-white/20 px-2.5 py-1 rounded-full">
               My
             </Link>
-            <Link href="/mypage">
+            <Link href="/menu">
               <Menu className="w-5 h-5 text-white/90" />
             </Link>
           </div>

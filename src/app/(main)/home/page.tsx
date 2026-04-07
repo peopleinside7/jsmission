@@ -49,16 +49,14 @@ export default function HomePage() {
       {/* ── 1. Header: 녹색 배경 + SVG 독수리 로고 + JS MISSION + 사용자명 + 알림 + 메뉴 ── */}
       <div className="bg-[#1E5631] px-4 pt-3 pb-4 sticky top-0 z-50">
         <div className="flex items-center justify-between max-w-[640px] mx-auto">
-          {/* 로고: 원본 이미지를 흰색 음각 처리 */}
-          <div className="flex items-center">
-            <Image
-              src="/logo_h.png"
-              alt="JS MISSION"
-              width={140}
-              height={40}
-              className="brightness-0 invert"
-              priority
-            />
+          {/* 로고: SVG 독수리 + JS MISSION 텍스트 */}
+          <div className="flex items-center gap-2">
+            <svg width="28" height="28" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 4C16 8 10 12 8 18C6 24 10 30 16 32C12 28 12 22 14 18C16 14 20 10 20 4Z" fill="white" opacity="0.9"/>
+              <path d="M20 4C24 8 30 12 32 18C34 24 30 30 24 32C28 28 28 22 26 18C24 14 20 10 20 4Z" fill="white" opacity="0.7"/>
+              <path d="M20 8C18 14 14 18 12 22C10 26 12 30 16 32L20 28L24 32C28 30 30 26 28 22C26 18 22 14 20 8Z" fill="white" opacity="0.5"/>
+            </svg>
+            <span className="text-white font-bold text-lg tracking-wide">JS MISSION</span>
           </div>
           {/* 우측: 사용자명 + 알림 + 메뉴 */}
           <div className="flex items-center gap-3">

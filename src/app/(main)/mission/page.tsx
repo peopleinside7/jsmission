@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { ChevronLeft, Plus, MapPin, Clock, Heart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const STAGE_COLORS: Record<string, string> = {
   ATTEMPT: '#4CAF50', PRELIM: '#FF9800', GOSPEL: '#E53935', WORSHIP: '#FF9800', COMPLETE: '#1E5631',
@@ -68,8 +69,9 @@ export default function MissionPage() {
 
   return (
     <div className="pb-24">
-      <div className="bg-[#1E5631] px-4 py-4">
-        <h1 className="text-lg font-bold text-white">선교 일지</h1>
+      <div className="bg-[#1E5631] px-4 py-4 flex items-center gap-3">
+        <h1 className="text-lg font-bold text-white flex-1">선교 일지</h1>
+        <Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" />
       </div>
 
       {/* Tabs */}

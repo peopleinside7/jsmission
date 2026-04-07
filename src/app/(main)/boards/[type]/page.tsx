@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronLeft, Eye, MessageCircle, Heart, Plus } from 'lucide-react';
+import Image from 'next/image';
 
 const BOARD_TITLES: Record<string, string> = {
   NOTICE: '공지사항', SERMON: '생명의 말씀', FREE: '자유게시판', FEEDBACK: 'Feedback'
@@ -40,7 +41,7 @@ export default function BoardPage() {
     }
   };
 
-  const canWrite = boardType === 'FREE' || boardType === 'FEEDBACK';
+  const canWrite = true;
 
   return (
     <div className="pb-24">
@@ -50,6 +51,7 @@ export default function BoardPage() {
         {canWrite && (
           <button onClick={() => setShowWrite(true)} className="text-white"><Plus className="w-6 h-6" /></button>
         )}
+        <Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" />
       </div>
 
       <div className="page-container pt-2">

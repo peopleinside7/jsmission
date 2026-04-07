@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Plus, Search } from 'lucide-react';
 
 const STAGE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
@@ -59,11 +60,12 @@ export default function NewcomersPage() {
 
   return (
     <div className="pb-24">
-      <div className="bg-[#1E5631] px-4 py-4 flex items-center justify-between">
-        <h1 className="text-lg font-bold text-white">신입생 상황</h1>
+      <div className="bg-[#1E5631] px-4 py-4 flex items-center gap-3">
+        <h1 className="text-lg font-bold text-white flex-1">신입생 상황</h1>
         <button onClick={() => setShowCreate(true)} className="text-white bg-white/20 p-2 rounded-full">
           <Plus className="w-5 h-5" />
         </button>
+        <Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" />
       </div>
 
       {/* Tabs */}

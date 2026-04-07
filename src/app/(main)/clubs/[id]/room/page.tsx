@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { ChevronLeft, Send, Pin, Users, Calendar, FileText, MessageCircle, UserPlus } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const ROOM_TABS = [
   { icon: Calendar, label: '일정' },
@@ -81,6 +82,7 @@ export default function ClubRoomPage() {
         <div className="flex items-center text-white/70 text-xs">
           <Users className="w-4 h-4 mr-1" />{members.length}
         </div>
+        <Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" />
       </div>
 
       {/* Tabs */}

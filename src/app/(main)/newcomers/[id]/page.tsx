@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ChevronLeft, Phone, Calendar, User } from 'lucide-react';
+import Image from 'next/image';
 
 const STAGES = [
   { key: 'ATTEMPT', label: '시도', icon: '🎯', color: '#4CAF50' },
@@ -60,7 +61,8 @@ export default function NewcomerDetailPage() {
       {/* Header */}
       <div className="bg-[#1E5631] px-4 py-3 flex items-center gap-3 sticky top-0 z-40">
         <button onClick={() => router.back()}><ChevronLeft className="w-6 h-6 text-white" /></button>
-        <h1 className="text-base font-bold text-white">{newcomer.name}</h1>
+        <h1 className="text-base font-bold text-white flex-1">{newcomer.name}</h1>
+        <Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" />
       </div>
 
       <div className="px-4 pt-6 max-w-[640px] mx-auto">

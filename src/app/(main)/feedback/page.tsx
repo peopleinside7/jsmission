@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, Plus, Lock } from 'lucide-react';
+import Image from 'next/image';
 
 export default function FeedbackPage() {
   const router = useRouter();
@@ -35,6 +36,7 @@ export default function FeedbackPage() {
         <button onClick={() => router.back()}><ChevronLeft className="w-6 h-6 text-white" /></button>
         <h1 className="text-base font-bold text-white flex-1">Feedback</h1>
         <button onClick={() => setShowWrite(true)} className="text-white"><Plus className="w-6 h-6" /></button>
+        <Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" />
       </div>
 
       <div className="page-container pt-2">

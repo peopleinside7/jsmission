@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ChevronRight, Trophy, Users, Target } from 'lucide-react';
 
 interface Club {
@@ -29,8 +30,9 @@ export default function ClubsPage() {
   return (
     <div className="pb-24">
       {/* Header */}
-      <div className="bg-[#1E5631] px-4 py-4">
-        <h1 className="text-lg font-bold text-white">우리교회 선교동아리</h1>
+      <div className="bg-[#1E5631] px-4 py-4 flex items-center gap-3">
+        <h1 className="text-lg font-bold text-white flex-1">우리교회 선교동아리</h1>
+        <Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" />
       </div>
 
       {/* Tabs */}

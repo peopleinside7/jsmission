@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { ChevronLeft, Users, Calendar, MapPin, DollarSign, Lock } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface ClubDetail {
   id: number; name: string; icon: string; icon_color: string; slogan: string;
@@ -75,6 +76,7 @@ export default function ClubDetailPage() {
             <Lock className="w-3 h-3 inline mr-1" />운영방
           </Link>
         )}
+        <Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" />
       </div>
 
       <div className="px-4 pt-6 max-w-[640px] mx-auto">

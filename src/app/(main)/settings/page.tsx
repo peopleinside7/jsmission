@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, Bell, Shield, Lock, Check } from 'lucide-react';
+import Image from 'next/image';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -63,7 +64,8 @@ export default function SettingsPage() {
     <div className="pb-24 bg-white min-h-screen">
       <div className="bg-[#1E5631] px-4 py-3 flex items-center gap-3 sticky top-0 z-40">
         <button onClick={() => router.back()} aria-label="뒤로 가기"><ChevronLeft className="w-6 h-6 text-white" /></button>
-        <h1 className="text-base font-bold text-white">설정</h1>
+        <h1 className="text-base font-bold text-white flex-1">설정</h1>
+        <Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" />
       </div>
 
       <div className="px-4 pt-4 max-w-[640px] mx-auto">

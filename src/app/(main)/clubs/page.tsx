@@ -249,7 +249,7 @@ function ClubCalendar() {
       {/* 선택한 날짜 상세 */}
       {selectedDay && (
         <div className="card p-4 mb-4">
-          <h4 className="text-sm font-bold text-[#1A1A1A] mb-3">{month + 1}월 {selectedDay}일 일정</h4>
+          <h4 className="text-sm font-bold text-[#1A1A1A] mb-3">{viewMonth + 1}월 {selectedDay}일 일정</h4>
           {selectedClubs.length === 0 ? (
             <p className="text-xs text-[#999] text-center py-4">이 날에는 예정된 활동이 없습니다</p>
           ) : (

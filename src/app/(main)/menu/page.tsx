@@ -61,11 +61,11 @@ export default function MenuPage() {
     <div className="pb-24 bg-[#F5F5F5] min-h-screen">
       {/* Header */}
       <div className="bg-[#1E5631] px-4 py-3 flex items-center justify-between sticky top-0 z-50">
-        <h1 className="text-base font-bold text-white">전체메뉴</h1>
+        <Link href="/menu"><h1 className="text-base font-bold text-white">전체메뉴</h1></Link>
         <div className="flex items-center gap-3">
           <Link href="/settings"><Settings className="w-5 h-5 text-white/80" /></Link>
           <button onClick={() => router.back()}><X className="w-5 h-5 text-white/80" /></button>
-          <Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" />
+          <Link href="/home"><Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" /></Link>
         </div>
       </div>
 

@@ -61,11 +61,11 @@ export default function NewcomersPage() {
   return (
     <div className="pb-24">
       <div className="bg-[#1E5631] px-4 py-4 flex items-center gap-3">
-        <h1 className="text-lg font-bold text-white flex-1">신입생 상황</h1>
+        <Link href="/newcomers"><h1 className="text-lg font-bold text-white flex-1">신입생 상황</h1></Link>
         <button onClick={() => setShowCreate(true)} className="text-white bg-white/20 p-2 rounded-full">
           <Plus className="w-5 h-5" />
         </button>
-        <Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" />
+        <Link href="/home"><Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" /></Link>
       </div>
 
       {/* Tabs */}

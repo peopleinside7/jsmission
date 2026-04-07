@@ -75,14 +75,14 @@ export default function ClubRoomPage() {
         <button onClick={() => router.back()}>
           <ChevronLeft className="w-6 h-6 text-white" />
         </button>
-        <div className="flex-1">
+        <Link href="/clubs" className="flex-1">
           <h1 className="text-base font-bold text-white">{club.icon} {club.name}</h1>
           <p className="text-xs text-white/70">운영방</p>
-        </div>
+        </Link>
         <div className="flex items-center text-white/70 text-xs">
           <Users className="w-4 h-4 mr-1" />{members.length}
         </div>
-        <Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" />
+        <Link href="/home"><Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" /></Link>
       </div>
 
       {/* Tabs */}

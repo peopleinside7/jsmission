@@ -47,11 +47,11 @@ export default function BoardPage() {
     <div className="pb-24">
       <div className="bg-[#1E5631] px-4 py-3 flex items-center gap-3 sticky top-0 z-40">
         <button onClick={() => router.back()}><ChevronLeft className="w-6 h-6 text-white" /></button>
-        <h1 className="text-base font-bold text-white flex-1">{BOARD_TITLES[boardType] || boardType}</h1>
+        <Link href="/boards/FREE"><h1 className="text-base font-bold text-white flex-1">{BOARD_TITLES[boardType] || boardType}</h1></Link>
         {canWrite && (
           <button onClick={() => setShowWrite(true)} className="text-white"><Plus className="w-6 h-6" /></button>
         )}
-        <Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" />
+        <Link href="/home"><Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" /></Link>
       </div>
 
       <div className="page-container pt-2">

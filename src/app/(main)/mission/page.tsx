@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { ChevronLeft, Plus, MapPin, Clock, Heart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
 
 const STAGE_COLORS: Record<string, string> = {
@@ -70,8 +71,8 @@ export default function MissionPage() {
   return (
     <div className="pb-24">
       <div className="bg-[#1E5631] px-4 py-4 flex items-center gap-3">
-        <h1 className="text-lg font-bold text-white flex-1">선교 일지</h1>
-        <Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" />
+        <Link href="/mission"><h1 className="text-lg font-bold text-white flex-1">선교 일지</h1></Link>
+        <Link href="/home"><Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" /></Link>
       </div>
 
       {/* Tabs */}

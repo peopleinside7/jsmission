@@ -76,13 +76,13 @@ export default function ClubDetailPage() {
         <button onClick={() => router.back()}>
           <ChevronLeft className="w-6 h-6 text-white" />
         </button>
-        <h1 className="text-base font-bold text-white flex-1">{club.name}</h1>
+        <Link href="/clubs"><h1 className="text-base font-bold text-white flex-1">{club.name}</h1></Link>
         {isMember && (
           <Link href={`/clubs/${club.id}/room`} className="text-white text-xs bg-white/20 px-3 py-1.5 rounded-full">
             <Lock className="w-3 h-3 inline mr-1" />운영방
           </Link>
         )}
-        <Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" />
+        <Link href="/home"><Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" /></Link>
       </div>
 
       <div className="px-4 pt-6 max-w-[640px] mx-auto">

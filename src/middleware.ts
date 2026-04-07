@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const PUBLIC_PATHS = ['/login', '/api/auth/login', '/api/auth/register', '/api/auth/reset-password', '/api/init'];
+const PUBLIC_PATHS = ['/login', '/api/auth/login', '/api/auth/register', '/api/auth/reset-password', '/api/auth/guest', '/api/init'];
 const PUBLIC_PREFIXES = ['/api/files/', '/_next/', '/favicon.ico', '/logo_', '/sql-wasm.wasm'];
 
 export function middleware(request: NextRequest) {

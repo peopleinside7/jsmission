@@ -10,8 +10,10 @@ export default function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>('login');
   const [loading, setLoading] = useState(false);
+  const [guestLoading, setGuestLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [guestName, setGuestName] = useState('');
   const [form, setForm] = useState({
     name: '', password: '', phone: '', department: '', referral_source: ''
   });
@@ -69,6 +71,29 @@ export default function LoginPage() {
     }
   };
 
+  const handleGuestEntry = async () => {
+    if (!guestName.trim()) {
+      setError('본인 이름을 입력해주세요');
+      return;
+    }
+    setError('');
+    setGuestLoading(true);
+    try {
+      const res = await fetch('/api/auth/guest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: guestName.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error); return; }
+      router.push('/home');
+    } catch {
+      setError('서버 연결에 실패했습니다');
+    } finally {
+      setGuestLoading(false);
+    }
+  };
+
   const switchMode = (newMode: Mode) => {
     setMode(newMode);
     setError('');
@@ -79,12 +104,42 @@ export default function LoginPage() {
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-sm">
         {/* Logo */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             <Image src="/logo_r.png" alt="JS MISSION" width={100} height={100} className="rounded-full" />
           </div>
           <h1 className="text-2xl font-bold text-[#1E5631]">JS MISSION</h1>
           <p className="text-sm text-[#666] mt-1">안산주성령교회 문화선교</p>
+        </div>
+
+        {/* ── 테스트 입장 (최상단, 눈에 잘 띄게) ── */}
+        <div className="mb-6 p-5 bg-[#F1F8E9] border-2 border-[#1E5631] rounded-2xl">
+          <h3 className="text-sm font-bold text-[#1E5631] mb-3 text-center">테스트 입장</h3>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              className="input-field flex-1"
+              placeholder="본인 이름을 기재해주세요"
+              value={guestName}
+              onChange={(e) => setGuestName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleGuestEntry()}
+            />
+            <button
+              onClick={handleGuestEntry}
+              disabled={guestLoading}
+              className="bg-[#1E5631] text-white px-4 py-3 rounded-xl text-sm font-semibold whitespace-nowrap shrink-0 hover:bg-[#2D7A3A] disabled:opacity-50"
+            >
+              {guestLoading ? '...' : '테스트 입장'}
+            </button>
+          </div>
+          <p className="text-[10px] text-[#999] mt-2 text-center">이름만 입력하면 바로 앱을 체험할 수 있습니다</p>
+        </div>
+
+        {/* 구분선 */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="flex-1 h-[1px] bg-[#E0E0E0]" />
+          <span className="text-xs text-[#BDBDBD]">또는 회원 로그인</span>
+          <div className="flex-1 h-[1px] bg-[#E0E0E0]" />
         </div>
 
         {success && (
@@ -100,7 +155,6 @@ export default function LoginPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* 로그인: 이름 + 비밀번호 */}
           {mode === 'login' && (
             <>
               <div>
@@ -116,7 +170,6 @@ export default function LoginPage() {
             </>
           )}
 
-          {/* 회원가입: 이름 + 연락처 + 비밀번호 + 부서 + 가입경로 */}
           {mode === 'register' && (
             <>
               <div>
@@ -147,7 +200,6 @@ export default function LoginPage() {
             </>
           )}
 
-          {/* 비밀번호 찾기: 연락처 입력 */}
           {mode === 'reset' && (
             <div>
               <label className="text-sm font-medium text-[#333] mb-1.5 block">연락처 *</label>
@@ -161,7 +213,6 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Mode switcher */}
         <div className="text-center mt-6 space-y-2">
           {mode === 'login' && (
             <>
@@ -190,18 +241,6 @@ export default function LoginPage() {
             <p className="text-xs text-[#666] text-center">가입 신청 후 관리자 승인이 완료되면 로그인할 수 있습니다</p>
           </div>
         )}
-        {mode === 'reset' && (
-          <div className="mt-4 p-3 bg-[#FFF3E0] rounded-xl">
-            <p className="text-xs text-[#666] text-center">등록된 연락처로 임시 비밀번호가 발급됩니다</p>
-          </div>
-        )}
-
-        {/* Demo */}
-        <div className="mt-8 p-4 bg-[#F7F7F7] rounded-xl">
-          <p className="text-xs text-[#999] text-center mb-2">테스트 계정</p>
-          <p className="text-xs text-[#666] text-center">Admin: 관리자 / admin1234</p>
-          <p className="text-xs text-[#666] text-center">User: 김성도 / test1234</p>
-        </div>
 
         {/* Footer */}
         <div className="mt-10 pb-6 text-center space-y-1">

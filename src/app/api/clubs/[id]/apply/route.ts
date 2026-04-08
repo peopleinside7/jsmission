@@ -73,9 +73,12 @@ export async function POST(
       applicationId: result.lastInsertRowid,
       status: 'PENDING',
     }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Club apply error:', error);
-    return Response.json({ error: '클럽 신청 중 오류가 발생했습니다' }, { status: 500 });
+    return Response.json({
+      error: '클럽 신청 중 오류가 발생했습니다',
+      detail: error?.message || String(error),
+    }, { status: 500 });
   }
 }
 

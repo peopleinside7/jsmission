@@ -49,12 +49,12 @@ export default function ClubDetailPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(applyForm),
     });
+    const data = await res.json();
     if (res.ok) {
       setShowApply(false);
       alert('신청이 완료되었습니다!');
     } else {
-      const data = await res.json();
-      alert(data.error || '신청에 실패했습니다');
+      alert(data.error + (data.detail ? `\n(${data.detail})` : ''));
     }
     setApplyLoading(false);
   };

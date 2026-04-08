@@ -48,9 +48,6 @@ export default function BoardPage() {
       <div className="bg-[#1E5631] px-4 py-3 flex items-center gap-3 sticky top-0 z-40">
         <button onClick={() => router.back()}><ChevronLeft className="w-6 h-6 text-white" /></button>
         <Link href="/boards/FREE"><h1 className="text-base font-bold text-white flex-1">{BOARD_TITLES[boardType] || boardType}</h1></Link>
-        {canWrite && (
-          <button onClick={() => setShowWrite(true)} className="text-white text-xs bg-white/20 px-3 py-1.5 rounded-full flex items-center gap-1"><Plus className="w-4 h-4" /> 글쓰기</button>
-        )}
         <Link href="/home"><Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" /></Link>
       </div>
 
@@ -84,6 +81,16 @@ export default function BoardPage() {
           </div>
         )}
       </div>
+
+      {canWrite && (
+        <button
+          onClick={() => setShowWrite(true)}
+          className="fixed bottom-20 right-4 z-40 bg-[#4CAF50] hover:bg-[#43A047] text-white pl-3 pr-4 py-2.5 rounded-full shadow-lg shadow-[#4CAF50]/30 flex items-center gap-1.5 text-sm font-semibold"
+        >
+          <Plus className="w-4 h-4" />
+          글쓰기
+        </button>
+      )}
 
       {/* Write Modal */}
       {showWrite && (

@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/stores/authStore';
 import { ChevronLeft, Plus, Lock, Send, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function FeedbackPage() {
   const router = useRouter();
+  const { user } = useAuthStore();
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
   const [showWrite, setShowWrite] = useState(false);
   const [form, setForm] = useState({ title: '', content: '' });
@@ -46,6 +48,12 @@ export default function FeedbackPage() {
         setComments(prev => ({ ...prev, [id]: d.comments || [] }));
       }).catch(() => {});
     }
+  };
+
+  const handleDeleteFeedback = async (id: number) => {
+    if (!confirm('삭제하시겠습니까?')) return;
+    const res = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+    if (res.ok) setFeedbacks(feedbacks.filter(fb => fb.id !== id));
   };
 
   const submitComment = async (postId: number) => {
@@ -91,7 +99,13 @@ export default function FeedbackPage() {
                 {/* 피드백 본문 */}
                 <button onClick={() => toggleExpand(fb.id)} className="w-full p-4 text-left">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-[#1A1A1A]">{fb.title}</p>
+                    <p className="text-sm font-semibold text-[#1A1A1A] flex-1">{fb.title}</p>
+                    {(fb.author_id === user?.userId || user?.role === 'ADMIN') && (
+                      <span
+                        onClick={(e) => { e.stopPropagation(); handleDeleteFeedback(fb.id); }}
+                        className="text-[10px] text-[#BDBDBD] hover:text-[#E53935] mr-2 cursor-pointer"
+                      >삭제</span>
+                    )}
                     {expandedId === fb.id ? <ChevronUp className="w-4 h-4 text-[#999]" /> : <ChevronDown className="w-4 h-4 text-[#999]" />}
                   </div>
                   <p className="text-xs text-[#666] line-clamp-2 mt-1">{fb.content}</p>

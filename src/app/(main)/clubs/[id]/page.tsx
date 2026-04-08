@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
-import { ChevronLeft, ChevronRight, Users, Calendar, MapPin, DollarSign, Lock, Heart, Send } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Users, Calendar, MapPin, DollarSign, Heart, Send } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -78,8 +78,8 @@ export default function ClubDetailPage() {
         </button>
         <Link href="/clubs"><h1 className="text-base font-bold text-white flex-1">{club.name}</h1></Link>
         {isMember && (
-          <Link href={`/clubs/${club.id}/room`} className="text-white text-xs bg-white/20 px-3 py-1.5 rounded-full">
-            <Lock className="w-3 h-3 inline mr-1" />운영방
+          <Link href={`/clubs/${club.id}/room`} className="text-white text-xs bg-white/20 px-3 py-1.5 rounded-full flex items-center gap-1">
+            💬 회원 전용
           </Link>
         )}
         <Link href="/home"><Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" /></Link>
@@ -174,7 +174,7 @@ export default function ClubDetailPage() {
           <Link href={`/clubs/${club.id}/room`} className="block w-full mb-4">
             <div className="bg-[#1E5631] text-white rounded-2xl p-4 flex items-center justify-between">
               <div>
-                <p className="text-sm font-bold">동아리 운영방</p>
+                <p className="text-sm font-bold">동아리 회원 전용 대화방</p>
                 <p className="text-xs text-white/70 mt-0.5">일정 · 공지 · 대화방 · 자료방 · 신입생</p>
               </div>
               <ChevronRight className="w-5 h-5 text-white/70" />

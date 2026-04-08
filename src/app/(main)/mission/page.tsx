@@ -85,6 +85,22 @@ export default function MissionPage() {
     } catch { /* ignore */ }
   };
 
+  const handleDeleteAppt = async (apptId: number) => {
+    if (!confirm('삭제하시겠습니까?')) return;
+    const res = await fetch(`/api/mission/appointments/${apptId}`, { method: 'DELETE' });
+    if (res.ok) setAppointments(appointments.filter(a => a.id !== apptId));
+  };
+
+  const handleDeleteComment = async (apptId: number, commentId: number) => {
+    if (!confirm('삭제하시겠습니까?')) return;
+    await fetch(`/api/mission/appointments/${apptId}/comments`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ commentId }),
+    });
+    loadApptComments(apptId, true);
+  };
+
   const totalNewcomers = Object.values(pipeline).reduce((s, v) => s + (v || 0), 0);
 
   return (
@@ -183,6 +199,12 @@ export default function MissionPage() {
                     {a.appointment_date && <span className="text-xs text-[#999]"><Clock className="w-3 h-3 inline" /> {a.appointment_date} {a.start_time || ''}</span>}
                     {a.location && <span className="text-xs text-[#999]"><MapPin className="w-3 h-3 inline" /> {a.location}</span>}
                   </div>
+                  {(a.created_by === user?.userId || user?.role === 'ADMIN') && (
+                    <div className="flex gap-2 mt-2">
+                      <button onClick={(e) => { e.stopPropagation(); /* edit */ }} className="text-[10px] text-[#999] hover:text-[#1E5631]">수정</button>
+                      <button onClick={(e) => { e.stopPropagation(); handleDeleteAppt(a.id); }} className="text-[10px] text-[#999] hover:text-[#E53935]">삭제</button>
+                    </div>
+                  )}
                 </div>
                 {/* Inline comments */}
                 <div className="border-t border-[#F0F0F0] bg-[#FAFAFA]">
@@ -198,6 +220,9 @@ export default function MissionPage() {
                             </div>
                             <p className="text-xs text-[#555] mt-0.5">{c.content}</p>
                           </div>
+                          {(c.user_id === user?.userId || user?.role === 'ADMIN') && (
+                            <button onClick={() => handleDeleteComment(a.id, c.id)} className="text-[10px] text-[#BDBDBD] hover:text-[#E53935] ml-auto shrink-0">삭제</button>
+                          )}
                         </div>
                       ))}
                     </div>

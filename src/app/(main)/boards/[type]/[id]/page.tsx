@@ -3,12 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ChevronLeft, Heart, MessageCircle, Eye, Send } from 'lucide-react';
+import { useAuthStore } from '@/stores/authStore';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function PostDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { user } = useAuthStore();
   const [post, setPost] = useState<any>(null);
   const [comments, setComments] = useState<any[]>([]);
   const [newComment, setNewComment] = useState('');
@@ -50,6 +52,18 @@ export default function PostDetailPage() {
     }
   };
 
+  const handleDeletePost = async () => {
+    if (!confirm('게시글을 삭제하시겠습니까?')) return;
+    const res = await fetch(`/api/posts/${params.id}`, { method: 'DELETE' });
+    if (res.ok) router.back();
+  };
+
+  const handleDeleteComment = async (commentId: number) => {
+    if (!confirm('댓글을 삭제하시겠습니까?')) return;
+    await fetch(`/api/posts/${params.id}/comments/${commentId}`, { method: 'DELETE' });
+    fetch(`/api/posts/${params.id}/comments`).then(r => r.json()).then(d => setComments(d.comments || [])).catch(() => {});
+  };
+
   if (!post) return <div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-4 border-[#E8F5E9] border-t-[#1E5631] rounded-full animate-spin" /></div>;
 
   return (
@@ -64,11 +78,17 @@ export default function PostDetailPage() {
         {/* Post */}
         <div className="mb-6">
           <h2 className="text-lg font-bold text-[#1A1A1A] mb-2">{post.title}</h2>
-          <div className="flex items-center gap-3 text-xs text-[#999] mb-4">
+          <div className="flex items-center gap-3 text-xs text-[#999] mb-2">
             <span>{post.author_name}</span>
             <span>{new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
             <span className="flex items-center gap-0.5"><Eye className="w-3 h-3" />{post.view_count}</span>
           </div>
+          {(post.author_id === user?.userId || user?.role === 'ADMIN') && (
+            <div className="flex gap-3 mb-4">
+              <button className="text-xs text-[#999] hover:text-[#1E5631]">수정</button>
+              <button onClick={handleDeletePost} className="text-xs text-[#999] hover:text-[#E53935]">삭제</button>
+            </div>
+          )}
           <div className="text-sm text-[#333] leading-relaxed whitespace-pre-wrap">
             {post.content}
           </div>
@@ -99,7 +119,12 @@ export default function PostDetailPage() {
                     <span className="text-xs text-[#BDBDBD]">{new Date(comment.created_at).toLocaleDateString('ko-KR')}</span>
                   </div>
                   <p className="text-sm text-[#333] mt-0.5">{comment.content}</p>
-                  <button onClick={() => setReplyTo(comment.id)} className="text-xs text-[#999] mt-1">답글</button>
+                  <div className="flex items-center gap-2 mt-1">
+                    <button onClick={() => setReplyTo(comment.id)} className="text-xs text-[#999]">답글</button>
+                    {(comment.author_id === user?.userId || user?.role === 'ADMIN') && (
+                      <button onClick={() => handleDeleteComment(comment.id)} className="text-xs text-[#999] hover:text-[#E53935]">삭제</button>
+                    )}
+                  </div>
                 </div>
               </div>
               {/* Replies */}
@@ -114,6 +139,9 @@ export default function PostDetailPage() {
                       <span className="text-xs text-[#BDBDBD]">{new Date(reply.created_at).toLocaleDateString('ko-KR')}</span>
                     </div>
                     <p className="text-sm text-[#333] mt-0.5">{reply.content}</p>
+                    {(reply.author_id === user?.userId || user?.role === 'ADMIN') && (
+                      <button onClick={() => handleDeleteComment(reply.id)} className="text-xs text-[#999] hover:text-[#E53935] mt-1">삭제</button>
+                    )}
                   </div>
                 </div>
               ))}

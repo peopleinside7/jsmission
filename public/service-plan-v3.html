@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JS MISSION V3.0 — 문화선교 앱 서비스기획서</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+@page { size: A4; margin: 20mm; }
+@media print { .no-print { display: none !important; } body { background: white; } .page-break { page-break-before: always; } }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Noto Sans KR', sans-serif; color: #222; background: #F0F0F0; line-height: 1.8; font-size: 14px; }
+.doc { max-width: 860px; margin: 0 auto; background: white; box-shadow: 0 0 40px rgba(0,0,0,0.08); }
+
+/* Cover Page */
+.cover-page { background: linear-gradient(160deg, #1E5631 0%, #2D7A3A 40%, #1E5631 100%); color: white; padding: 100px 60px 80px; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
+.cover-page::before { content: ''; position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: rgba(255,255,255,0.03); border-radius: 50%; }
+.cover-page::after { content: ''; position: absolute; bottom: -50px; left: -50px; width: 300px; height: 300px; background: rgba(255,255,255,0.02); border-radius: 50%; }
+.cover-logo { width: 90px; height: 90px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); margin-bottom: 30px; }
+.cover-label { font-size: 13px; letter-spacing: 6px; opacity: 0.6; text-transform: uppercase; margin-bottom: 12px; }
+.cover-title { font-size: 48px; font-weight: 900; line-height: 1.2; margin-bottom: 8px; }
+.cover-subtitle { font-size: 20px; font-weight: 400; opacity: 0.85; margin-bottom: 40px; }
+.cover-meta { font-size: 13px; opacity: 0.6; line-height: 2; }
+.cover-version { display: inline-block; background: rgba(255,255,255,0.15); padding: 8px 24px; border-radius: 30px; font-size: 14px; font-weight: 600; margin-top: 30px; }
+
+/* Inner pages */
+.page { padding: 50px 60px; }
+.page-break { border-top: 2px solid #E8F5E9; margin: 0; }
+
+/* Chapter heading */
+.chapter { margin-bottom: 30px; }
+.chapter-num { display: inline-block; background: #1E5631; color: white; width: 36px; height: 36px; border-radius: 10px; text-align: center; line-height: 36px; font-size: 16px; font-weight: 800; margin-right: 12px; vertical-align: middle; }
+.chapter-title { font-size: 26px; font-weight: 800; color: #1E5631; display: inline; vertical-align: middle; }
+.chapter-desc { font-size: 14px; color: #888; margin-top: 6px; margin-left: 48px; }
+
+/* Section heading */
+h3 { font-size: 17px; font-weight: 700; color: #1A1A1A; margin: 28px 0 12px; padding-left: 14px; border-left: 4px solid #1E5631; }
+h4 { font-size: 15px; font-weight: 600; color: #333; margin: 20px 0 8px; }
+p { margin-bottom: 10px; color: #444; }
+ul, ol { padding-left: 22px; margin: 8px 0 16px; color: #444; }
+li { margin-bottom: 4px; }
+strong { color: #1E5631; }
+
+/* Table */
+table { width: 100%; border-collapse: collapse; margin: 14px 0 20px; font-size: 13px; }
+th { background: #1E5631; color: white; padding: 10px 14px; text-align: left; font-weight: 600; font-size: 12px; }
+td { padding: 9px 14px; border-bottom: 1px solid #EFEFEF; vertical-align: top; }
+tr:nth-child(even) td { background: #FAFAFA; }
+.tbl-light th { background: #F5F5F5; color: #333; }
+
+/* Tags */
+.tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-right: 4px; }
+.tag-green { background: #E8F5E9; color: #1E5631; }
+.tag-red { background: #FFEBEE; color: #E53935; }
+.tag-blue { background: #E3F2FD; color: #1E88E5; }
+.tag-orange { background: #FFF3E0; color: #FF9800; }
+.tag-gray { background: #F5F5F5; color: #999; }
+.tag-dark { background: #1E5631; color: white; }
+
+/* Cards */
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 16px 0; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 16px 0; }
+.card-sm { background: #FAFAFA; border: 1px solid #EEE; border-radius: 12px; padding: 16px; }
+.card-sm .icon { font-size: 24px; margin-bottom: 6px; }
+.card-sm .label { font-size: 13px; font-weight: 700; color: #1A1A1A; }
+.card-sm .desc { font-size: 11px; color: #999; margin-top: 3px; }
+
+/* Flow diagram */
+.flow { display: flex; align-items: center; gap: 6px; margin: 16px 0; flex-wrap: wrap; }
+.flow-box { padding: 10px 18px; border-radius: 12px; font-size: 13px; font-weight: 700; text-align: center; min-width: 90px; }
+.flow-arr { color: #BDBDBD; font-size: 20px; font-weight: 300; }
+
+/* Color chips */
+.color-row { display: flex; gap: 6px; margin: 8px 0; flex-wrap: wrap; }
+.color-chip { width: 100px; height: 48px; border-radius: 8px; display: flex; align-items: flex-end; padding: 4px 8px; font-size: 10px; font-weight: 700; color: white; }
+
+/* Highlight box */
+.highlight { background: #F1F8E9; border: 1px solid #C8E6C9; border-radius: 12px; padding: 20px; margin: 16px 0; }
+.highlight-title { font-size: 14px; font-weight: 700; color: #1E5631; margin-bottom: 6px; }
+
+/* Version comparison */
+.vs-table td:first-child { font-weight: 600; color: #1E5631; width: 30%; }
+
+/* Footer */
+.doc-footer { background: #1E5631; color: white; padding: 40px 60px; text-align: center; }
+.doc-footer p { color: rgba(255,255,255,0.7); font-size: 12px; margin: 3px 0; }
+.doc-footer .ft-title { font-size: 18px; font-weight: 800; color: white; margin-bottom: 10px; }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .cover-page { padding: 60px 30px; }
+  .cover-title { font-size: 32px; }
+  .page { padding: 30px 20px; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .grid-2 { grid-template-columns: 1fr; }
+  table { font-size: 11px; }
+  th, td { padding: 7px 8px; }
+}
+</style>
+</head>
+<body>
+<div class="doc">
+
+<!-- ============================= -->
+<!-- COVER PAGE                    -->
+<!-- ============================= -->
+<div class="cover-page">
+  <div class="cover-label">SERVICE PLAN DOCUMENT</div>
+  <div class="cover-title">JS MISSION</div>
+  <div class="cover-subtitle">문화선교 앱 서비스기획서</div>
+  <div class="cover-meta">
+    안산주성령교회 문화선교부<br>
+    작성자: Praise Hong<br>
+    작성일: 2025년 4월<br>
+    문서분류: 내부 기획 보고서
+  </div>
+  <div class="cover-version">Version 3.0</div>
+</div>
+
+<!-- ============================= -->
+<!-- 목차                          -->
+<!-- ============================= -->
+<div class="page">
+  <div class="chapter">
+    <span class="chapter-num">Ⅰ</span>
+    <span class="chapter-title">목차 (Table of Contents)</span>
+  </div>
+
+  <table class="tbl-light">
+    <tr><th width="8%">No.</th><th>항목</th><th width="15%">페이지</th></tr>
+    <tr><td>1</td><td>프로젝트 개요 (Executive Summary)</td><td>3</td></tr>
+    <tr><td>2</td><td>V2.0 → V3.0 변경 이력</td><td>4</td></tr>
+    <tr><td>3</td><td>서비스 정의</td><td>5</td></tr>
+    <tr><td>4</td><td>사용자 정의 및 역할 체계</td><td>6</td></tr>
+    <tr><td>5</td><td>선교동아리 구성 (7개)</td><td>7</td></tr>
+    <tr><td>6</td><td>선교 5단계 파이프라인</td><td>8</td></tr>
+    <tr><td>7</td><td>메뉴 구조 및 화면 설계</td><td>9</td></tr>
+    <tr><td>8</td><td>주요 기능 상세</td><td>11</td></tr>
+    <tr><td>9</td><td>기술 아키텍처</td><td>13</td></tr>
+    <tr><td>10</td><td>데이터베이스 설계</td><td>14</td></tr>
+    <tr><td>11</td><td>API 설계</td><td>15</td></tr>
+    <tr><td>12</td><td>보안 정책</td><td>17</td></tr>
+    <tr><td>13</td><td>디자인 가이드</td><td>18</td></tr>
+    <tr><td>14</td><td>배포 및 운영 계획</td><td>19</td></tr>
+    <tr><td>15</td><td>향후 로드맵</td><td>20</td></tr>
+  </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============================= -->
+<!-- 1. 프로젝트 개요               -->
+<!-- ============================= -->
+<div class="page">
+  <div class="chapter">
+    <span class="chapter-num">1</span>
+    <span class="chapter-title">프로젝트 개요</span>
+    <div class="chapter-desc">Executive Summary</div>
+  </div>
+
+  <h3>1.1 프로젝트 배경</h3>
+  <p>안산주성령교회는 <strong>문화선교</strong>를 핵심 전략으로 채택하여, 대중 문화 동아리 활동을 통해 일반인과 자연스럽게 접촉하고, 말씀으로 연결하며, 궁극적으로 교회 공동체로 이끄는 선교 모델을 운영하고 있습니다.</p>
+  <p>이를 체계적으로 지원하기 위한 디지털 플랫폼 <strong>'JS MISSION'</strong>을 기획·개발하였습니다.</p>
+
+  <h3>1.2 프로젝트 정의</h3>
+  <div class="highlight">
+    <div class="highlight-title">JS MISSION = 선교형 CRM + 동호회 운영 플랫폼</div>
+    <p style="margin:0;">동아리는 수단이며, <strong>사람 관리(선교 5단계 추적)</strong>가 핵심 목적입니다.</p>
+  </div>
+
+  <table>
+    <tr><th width="25%">항목</th><th>내용</th></tr>
+    <tr><td>프로젝트명</td><td><strong>JS MISSION V3.0</strong></td></tr>
+    <tr><td>소속</td><td>안산주성령교회 문화선교부</td></tr>
+    <tr><td>목적</td><td>문화 동아리 → 말씀 연결 → 교회 연결 (선교 5단계 추적)</td></tr>
+    <tr><td>플랫폼</td><td>반응형 모바일 웹앱 (모바일 최적화 + PC Admin)</td></tr>
+    <tr><td>라이브 URL</td><td><a href="https://jsmission.vercel.app" target="_blank">https://jsmission.vercel.app</a></td></tr>
+    <tr><td>소스코드</td><td><a href="https://github.com/peopleinside7/jsmission" target="_blank">github.com/peopleinside7/jsmission</a></td></tr>
+    <tr><td>개발자</td><td>Praise Hong</td></tr>
+    <tr><td>문서 버전</td><td>V3.0 (2025.04)</td></tr>
+  </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============================= -->
+<!-- 2. 변경 이력                   -->
+<!-- ============================= -->
+<div class="page">
+  <div class="chapter">
+    <span class="chapter-num">2</span>
+    <span class="chapter-title">V2.0 → V3.0 주요 변경 이력</span>
+  </div>
+
+  <table class="vs-table">
+    <tr><th width="30%">항목</th><th>V2.0 (기획)</th><th>V3.0 (구현 완료)</th></tr>
+    <tr><td>로그인 방식</td><td>이메일 + 비밀번호</td><td><strong>이름 + 비밀번호</strong> + 관리자 승인제</td></tr>
+    <tr><td>테스트 입장</td><td>미구현</td><td><strong>이름만 입력 → 즉시 입장</strong> (게스트 로그인)</td></tr>
+    <tr><td>동아리 수</td><td>8개</td><td><strong>7개</strong> (RUN&GLOW 제거)</td></tr>
+    <tr><td>동아리 포스터</td><td>아이콘만</td><td><strong>실제 포스터 이미지</strong> 7장 적용</td></tr>
+    <tr><td>동아리 일정</td><td>텍스트 목록</td><td><strong>월간 달력 + 아이콘 표시</strong> + 날짜 클릭 상세</td></tr>
+    <tr><td>생명 연결하기</td><td>미구현</td><td><strong>신입생 연결 전용 폼</strong> (전도자/신입생/상황/대화)</td></tr>
+    <tr><td>피드백</td><td>작성만 가능</td><td><strong>댓글 시스템</strong> (사용자↔관리자 양방향)</td></tr>
+    <tr><td>Admin 페이지</td><td>PC 전용</td><td><strong>반응형</strong> (모바일+PC 모두 사용 가능)</td></tr>
+    <tr><td>DB</td><td>better-sqlite3</td><td><strong>sql.js (WASM)</strong> — Vercel 서버리스 호환</td></tr>
+    <tr><td>보안</td><td>기본 JWT</td><td><strong>Middleware 인증 + 자동 토큰 갱신 + 입력 검증</strong></td></tr>
+    <tr><td>네비게이션</td><td>알림 중심</td><td><strong>My(개인) / 전체메뉴(메뉴맵) 분리</strong></td></tr>
+    <tr><td>헤더</td><td>고정형</td><td><strong>메뉴명 클릭→해당 페이지, 로고 클릭→홈</strong></td></tr>
+    <tr><td>노방선교</td><td>노방선교</td><td><strong>노방 전도</strong>로 명칭 변경</td></tr>
+    <tr><td>파이프라인 색상</td><td>빨강/주황/초록 혼재</td><td><strong>녹색 그라데이션</strong>으로 톤 통일</td></tr>
+  </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============================= -->
+<!-- 3. 서비스 정의                 -->
+<!-- ============================= -->
+<div class="page">
+  <div class="chapter">
+    <span class="chapter-num">3</span>
+    <span class="chapter-title">서비스 정의</span>
+  </div>
+
+  <h3>3.1 서비스 목표</h3>
+  <div class="grid-3">
+    <div class="card-sm">
+      <div class="icon">🎯</div>
+      <div class="label">접촉</div>
+      <div class="desc">문화 동아리를 통한 일반인과의 자연스러운 만남</div>
+    </div>
+    <div class="card-sm">
+      <div class="icon">📖</div>
+      <div class="label">말씀 연결</div>
+      <div class="desc">관계를 통해 말씀으로 자연스럽게 이어지는 선교</div>
+    </div>
+    <div class="card-sm">
+      <div class="icon">⛪</div>
+      <div class="label">교회 연결</div>
+      <div class="desc">예배 참석 → 정착 → 양육 완료까지 전 과정 추적</div>
+    </div>
+  </div>
+
+  <h3>3.2 핵심 가치</h3>
+  <ul>
+    <li><strong>선교형 CRM</strong> — 신입생의 5단계 여정을 체계적으로 추적·관리</li>
+    <li><strong>동호회 운영</strong> — 7개 문화 동아리의 모집, 일정, 소통을 통합 지원</li>
+    <li><strong>커뮤니티</strong> — 게시판, 피드백, 기도방을 통한 교인 간 소통</li>
+    <li><strong>데이터 기반 선교</strong> — 파이프라인 대시보드로 선교 현황 실시간 파악</li>
+  </ul>
+
+  <h3>3.3 대상 사용자</h3>
+  <table>
+    <tr><th>구분</th><th>대상</th><th>디바이스</th></tr>
+    <tr><td>일반 교인</td><td>동아리 참여, 선교 활동, 커뮤니티 이용</td><td>모바일 최적화</td></tr>
+    <tr><td>동아리 관리자</td><td>소속 동아리 운영, 신입생 CRM 관리</td><td>모바일 최적화</td></tr>
+    <tr><td>앱 관리자 (Admin)</td><td>전체 시스템 관리, 회원 승인, 통계</td><td>PC + 모바일 반응형</td></tr>
+    <tr><td>테스트 사용자</td><td>앱 체험 (이름만 입력)</td><td>모바일 최적화</td></tr>
+  </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============================= -->
+<!-- 4. 사용자 역할                 -->
+<!-- ============================= -->
+<div class="page">
+  <div class="chapter">
+    <span class="chapter-num">4</span>
+    <span class="chapter-title">사용자 정의 및 역할 체계</span>
+  </div>
+
+  <h3>4.1 역할 정의</h3>
+  <table>
+    <tr><th>역할</th><th>코드</th><th>설명</th><th>주요 권한</th></tr>
+    <tr>
+      <td><span class="tag tag-red">관리자</span></td>
+      <td>ADMIN</td>
+      <td>앱 총괄 관리자</td>
+      <td>전체 관리, 회원 승인/거절, 동아리 관리, 피드백 답변</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-blue">동아리 관리자</span></td>
+      <td>CLUB_ADMIN</td>
+      <td>동아리 운영진</td>
+      <td>소속 동아리 관리, 신청 승인, 신입생 CRM, 운영방 관리</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-green">일반 회원</span></td>
+      <td>USER</td>
+      <td>일반 교인</td>
+      <td>동아리 참여, 게시판, 선교일지, 생명연결, 피드백</td>
+    </tr>
+    <tr>
+      <td><span class="tag tag-gray">게스트</span></td>
+      <td>GUEST</td>
+      <td>테스트 사용자</td>
+      <td>이름만 입력하여 즉시 체험 (승인 불필요)</td>
+    </tr>
+  </table>
+
+  <h3>4.2 회원가입 프로세스</h3>
+  <div class="flow">
+    <div class="flow-box" style="background:#E8F5E9; color:#1E5631;">가입 신청<br><span style="font-size:10px; font-weight:400;">이름+연락처+비밀번호</span></div>
+    <span class="flow-arr">→</span>
+    <div class="flow-box" style="background:#FFF3E0; color:#FF9800;">승인 대기<br><span style="font-size:10px; font-weight:400;">관리자 검토</span></div>
+    <span class="flow-arr">→</span>
+    <div class="flow-box" style="background:#1E5631; color:white;">로그인 가능<br><span style="font-size:10px; font-weight:400;">이름+비밀번호</span></div>
+  </div>
+
+  <h3>4.3 권한 매트릭스</h3>
+  <table>
+    <tr><th>기능</th><th>USER</th><th>CLUB_ADMIN</th><th>ADMIN</th></tr>
+    <tr><td>동아리 소개/랭킹/일정 조회</td><td>✅</td><td>✅</td><td>✅</td></tr>
+    <tr><td>선교 참여 신청</td><td>✅</td><td>—</td><td>✅</td></tr>
+    <tr><td>생명 연결하기</td><td>✅</td><td>✅</td><td>✅</td></tr>
+    <tr><td>동아리 운영방 🔒</td><td>❌</td><td>✅</td><td>✅</td></tr>
+    <tr><td>신입생 CRM 관리</td><td>❌</td><td>✅</td><td>✅</td></tr>
+    <tr><td>신청 승인/거절</td><td>❌</td><td>✅</td><td>✅</td></tr>
+    <tr><td>게시판/댓글/좋아요</td><td>✅</td><td>✅</td><td>✅</td></tr>
+    <tr><td>선교일지 작성</td><td>✅</td><td>✅</td><td>✅</td></tr>
+    <tr><td>피드백 작성</td><td>✅</td><td>✅</td><td>✅(관리)</td></tr>
+    <tr><td>회원 승인/관리</td><td>❌</td><td>❌</td><td>✅</td></tr>
+    <tr><td>Admin 대시보드</td><td>❌</td><td>❌</td><td>✅</td></tr>
+  </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============================= -->
+<!-- 5. 동아리                     -->
+<!-- ============================= -->
+<div class="page">
+  <div class="chapter">
+    <span class="chapter-num">5</span>
+    <span class="chapter-title">선교동아리 구성 (7개)</span>
+  </div>
+
+  <table>
+    <tr><th>#</th><th>동아리명</th><th>카테고리</th><th>일정</th><th>회비</th><th>상태</th></tr>
+    <tr><td>🗣️</td><td><strong>오물오물 잉글리시</strong><br><span style="font-size:11px; color:#888;">시험이 아닌 언어로서의 영어 공부 총집약</span></td><td>교육</td><td>매주 토 10:00</td><td>10,000원</td><td><span class="tag tag-green">모집중</span></td></tr>
+    <tr><td>🍙</td><td><strong>일본어 회화 오니기리</strong><br><span style="font-size:11px; color:#888;">바로 써먹는 일본어 회화 입문</span></td><td>교육</td><td>격주 토 15:00</td><td>20,000원</td><td><span class="tag tag-green">모집중</span></td></tr>
+    <tr><td>⚽</td><td><strong>POWER F.C</strong><br><span style="font-size:11px; color:#888;">축구 팀원 모집</span></td><td>스포츠</td><td>매주 일 15:00</td><td>별도</td><td><span class="tag tag-green">모집중</span></td></tr>
+    <tr><td>🏃‍♀️</td><td><strong>여자 플로우 러닝크루</strong><br><span style="font-size:11px; color:#888;">함께 해요, 함께 뛰어요!</span></td><td>스포츠</td><td>매주 화,목 19:30</td><td>10,000원</td><td><span class="tag tag-green">모집중</span></td></tr>
+    <tr><td>💃</td><td><strong>디어댄스</strong><br><span style="font-size:11px; color:#888;">오늘은 내가 아이돌</span></td><td>문화</td><td>매주 토 16:00</td><td>20,000원</td><td><span class="tag tag-red">마감</span></td></tr>
+    <tr><td>🧭</td><td><strong>캠퍼스 나침반</strong><br><span style="font-size:11px; color:#888;">나랑 맞는 동아리가 어디게~</span></td><td>대학사역</td><td>상시</td><td>무료</td><td><span class="tag tag-green">모집중</span></td></tr>
+    <tr><td>🎵</td><td><strong>JS 하모닉스</strong><br><span style="font-size:11px; color:#888;">주성령 가족들의 진심 어린 마음이 모여 조화로운 하모니를 이룹니다</span></td><td>찬양</td><td>매주 일요일</td><td>별도</td><td><span class="tag tag-green">모집중</span></td></tr>
+  </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============================= -->
+<!-- 6. 파이프라인                   -->
+<!-- ============================= -->
+<div class="page">
+  <div class="chapter">
+    <span class="chapter-num">6</span>
+    <span class="chapter-title">선교 5단계 파이프라인</span>
+    <div class="chapter-desc">신입생의 선교 여정을 5단계로 추적합니다</div>
+  </div>
+
+  <div class="flow" style="margin:24px 0;">
+    <div class="flow-box" style="background:#EDF5F0; color:#5B9A6F; border:2px solid #5B9A6F;">🎯<br>시도</div>
+    <span class="flow-arr">→</span>
+    <div class="flow-box" style="background:#F0F7F3; color:#7BAA8E; border:2px solid #7BAA8E;">☕<br>전초</div>
+    <span class="flow-arr">→</span>
+    <div class="flow-box" style="background:#E8F5E9; color:#2D7A3A; border:2px solid #2D7A3A;">📖<br>말씀연결</div>
+    <span class="flow-arr">→</span>
+    <div class="flow-box" style="background:#EAF4ED; color:#3D8B5A; border:2px solid #3D8B5A;">⛪<br>예배참석</div>
+    <span class="flow-arr">→</span>
+    <div class="flow-box" style="background:#1E5631; color:white;">🎓<br>수료</div>
+  </div>
+
+  <table>
+    <tr><th>단계</th><th>코드</th><th>의미</th><th>색상</th></tr>
+    <tr><td>🎯 시도</td><td>ATTEMPT</td><td>전단지, 설문, 말 걸어보기 등 <strong>최초 접촉</strong></td><td><div style="width:60px;height:20px;background:#5B9A6F;border-radius:4px;"></div></td></tr>
+    <tr><td>☕ 전초</td><td>PRELIM</td><td>식사/차 — 말씀 연결 위한 <strong>전 단계 만남</strong></td><td><div style="width:60px;height:20px;background:#7BAA8E;border-radius:4px;"></div></td></tr>
+    <tr><td>📖 말씀연결</td><td>GOSPEL</td><td>노방, 전단지, 지인소개로 <strong>말씀 연결 (핵심!)</strong></td><td><div style="width:60px;height:20px;background:#2D7A3A;border-radius:4px;"></div></td></tr>
+    <tr><td>⛪ 예배참석</td><td>WORSHIP</td><td><strong>주일 예배 참석</strong></td><td><div style="width:60px;height:20px;background:#3D8B5A;border-radius:4px;"></div></td></tr>
+    <tr><td>🎓 수료</td><td>COMPLETE</td><td><strong>정착, 양육 완료</strong></td><td><div style="width:60px;height:20px;background:#1E5631;border-radius:4px;"></div></td></tr>
+  </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============================= -->
+<!-- 7. 메뉴 구조                   -->
+<!-- ============================= -->
+<div class="page">
+  <div class="chapter">
+    <span class="chapter-num">7</span>
+    <span class="chapter-title">메뉴 구조 및 화면 설계</span>
+  </div>
+
+  <h3>7.1 하단 탭바 (메인 네비게이션)</h3>
+  <table>
+    <tr><th width="10%">순서</th><th>탭명</th><th>경로</th><th>설명</th></tr>
+    <tr><td>1</td><td>선교동아리</td><td>/clubs</td><td>동아리 소개·랭킹·신청·일정·기도방</td></tr>
+    <tr><td>2</td><td>선교일지</td><td>/mission</td><td>선교 대시보드·노방전도·동아리홍보</td></tr>
+    <tr><td>3</td><td><strong>홈</strong> (중앙 원형)</td><td>/home</td><td>메인 대시보드</td></tr>
+    <tr><td>4</td><td>My</td><td>/mypage</td><td>내 정보·가입 동아리·알림</td></tr>
+    <tr><td>5</td><td>전체메뉴</td><td>/menu</td><td>메뉴맵·설정·로그아웃</td></tr>
+  </table>
+
+  <h3>7.2 전체 페이지 목록 (20+)</h3>
+  <table>
+    <tr><th>경로</th><th>페이지명</th><th>주요 기능</th></tr>
+    <tr><td>/login</td><td>로그인</td><td>이름+비밀번호, 테스트 입장, 회원가입, 비밀번호 찾기</td></tr>
+    <tr><td>/home</td><td>홈</td><td>로고 헤더, 카테고리 칩, 동아리 포스터 2열 그리드, 퀵메뉴 3×3, 공지</td></tr>
+    <tr><td>/clubs</td><td>선교동아리</td><td>5탭: 소개(카테고리필터), 랭킹, 신청, 일정(월간달력), 기도방</td></tr>
+    <tr><td>/clubs/[id]</td><td>동아리 상세</td><td>정보, 커리큘럼, 운영방 입장, 선교참여신청, <strong>생명연결하기</strong></td></tr>
+    <tr><td>/clubs/[id]/room</td><td>운영방</td><td>5탭: 일정, 공지, 대화방(3초 폴링), 자료방, 신입생 CRM</td></tr>
+    <tr><td>/mission</td><td>선교 일지</td><td>파이프라인, 노방 전도, 동아리 홍보, 약속 관리</td></tr>
+    <tr><td>/newcomers</td><td>신입생 상황</td><td>대시보드, 기도제목, 목록(단계 필터+검색)</td></tr>
+    <tr><td>/newcomers/[id]</td><td>신입생 상세</td><td>5단계 진행, 활동 타임라인, 기도, 상태 변경</td></tr>
+    <tr><td>/boards/[type]</td><td>게시판</td><td>공지사항, 생명의 말씀, 자유게시판 — 글쓰기/좋아요/댓글</td></tr>
+    <tr><td>/feedback</td><td>Feedback</td><td>비공개 피드백, <strong>관리자↔사용자 댓글 시스템</strong></td></tr>
+    <tr><td>/resources</td><td>자료실</td><td>캠퍼스 나침반, 동아리 홍보지, 기타 자료</td></tr>
+    <tr><td>/mypage</td><td>My</td><td>내 정보, 가입 동아리, 알림 내역</td></tr>
+    <tr><td>/menu</td><td>전체메뉴</td><td>2열 메뉴맵(접기/펴기), Admin, Family Site, 로그아웃</td></tr>
+    <tr><td>/settings</td><td>설정</td><td>알림 토글, 비밀번호 변경</td></tr>
+    <tr><td>/admin/*</td><td>Admin (5페이지)</td><td>대시보드, 동아리관리, 게시판관리, 회원관리, 피드백관리</td></tr>
+  </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============================= -->
+<!-- 8. 주요 기능 상세               -->
+<!-- ============================= -->
+<div class="page">
+  <div class="chapter">
+    <span class="chapter-num">8</span>
+    <span class="chapter-title">주요 기능 상세</span>
+  </div>
+
+  <h3>8.1 생명 연결하기 (V3.0 신규)</h3>
+  <p>각 동아리 상세 페이지에서 새로운 생명(신입생)을 동아리에 연결하는 핵심 선교 기능입니다.</p>
+  <table>
+    <tr><th>필드</th><th>설명</th></tr>
+    <tr><td>전도자 (연결자)</td><td>본인 이름 또는 소개해준 분의 이름</td></tr>
+    <tr><td>신입생 (생명) *</td><td>새로 연결할 분의 이름 (필수)</td></tr>
+    <tr><td>신입생 상황</td><td>만남 경위, 현재 상황</td></tr>
+    <tr><td>운영자와 대화하기</td><td>운영자에게 전할 메시지</td></tr>
+  </table>
+  <p>등록 시 해당 동아리의 <strong>신입생(CRM)으로 자동 등록</strong>되어 파이프라인에 반영됩니다.</p>
+
+  <h3>8.2 동아리 일정 달력 (V3.0 개선)</h3>
+  <ul>
+    <li>월간 달력에 각 동아리 <strong>아이콘이 해당 날짜에 직접 표시</strong></li>
+    <li>날짜 클릭 → 해당일 동아리 목록 + 시간 상세 표시</li>
+    <li><strong>좌우 화살표</strong>로 전달/다음달 이동</li>
+    <li>모바일 최적화: 아이콘 한줄 2개씩 배치</li>
+  </ul>
+
+  <h3>8.3 피드백 댓글 시스템 (V3.0 신규)</h3>
+  <table>
+    <tr><th>사용자 측</th><th>관리자 측</th></tr>
+    <tr>
+      <td>피드백 작성 → 목록에서 펼침 → 관리자 답변 확인 → 추가 댓글</td>
+      <td>Admin → 피드백 관리 → 전체 목록 → 답변 작성</td>
+    </tr>
+  </table>
+
+  <h3>8.4 테스트 입장 (V3.0 신규)</h3>
+  <p>로그인 화면 최상단에 <strong>이름만 입력</strong>하면 즉시 앱 체험 가능. 승인 절차 없이 자동 계정 생성.</p>
+
+  <h3>8.5 동아리 운영방 (멤버 전용)</h3>
+  <table>
+    <tr><th>탭</th><th>기능</th></tr>
+    <tr><td>일정</td><td>회차별 일정 관리, 출석 체크</td></tr>
+    <tr><td>공지</td><td>동아리 내부 공지사항</td></tr>
+    <tr><td>대화방</td><td>실시간 채팅 (3초 폴링), 메시지 고정</td></tr>
+    <tr><td>자료방</td><td>파일 업로드/다운로드</td></tr>
+    <tr><td>신입생</td><td>신입생 CRM — 5단계 추적, 기도, 활동 기록</td></tr>
+  </table>
+
+  <h3>8.6 게시판 공통 기능</h3>
+  <p>공지사항, 생명의 말씀, 자유게시판, Feedback 모든 게시판에서:</p>
+  <ul>
+    <li>글쓰기 (제목 + 본문)</li>
+    <li>♡ 좋아요 (1터치)</li>
+    <li>댓글 + 대댓글 (1단계 중첩)</li>
+    <li>조회수 자동 카운트</li>
+  </ul>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============================= -->
+<!-- 9. 기술 아키텍처               -->
+<!-- ============================= -->
+<div class="page">
+  <div class="chapter">
+    <span class="chapter-num">9</span>
+    <span class="chapter-title">기술 아키텍처</span>
+  </div>
+
+  <table>
+    <tr><th width="25%">구분</th><th>기술</th><th>버전</th></tr>
+    <tr><td>프레임워크</td><td>Next.js (App Router, Turbopack)</td><td>16.2</td></tr>
+    <tr><td>언어</td><td>TypeScript</td><td>5.x</td></tr>
+    <tr><td>스타일링</td><td>Tailwind CSS</td><td>4.x</td></tr>
+    <tr><td>상태관리</td><td>Zustand</td><td>5.x</td></tr>
+    <tr><td>데이터베이스</td><td>SQLite (sql.js WASM)</td><td>1.14</td></tr>
+    <tr><td>인증</td><td>JWT (jsonwebtoken) + bcryptjs</td><td>9.x / 3.x</td></tr>
+    <tr><td>아이콘</td><td>Lucide React</td><td>1.7</td></tr>
+    <tr><td>폰트</td><td>Noto Sans KR + Pretendard (CDN)</td><td>—</td></tr>
+    <tr><td>호스팅</td><td>Vercel (서버리스)</td><td>—</td></tr>
+    <tr><td>소스관리</td><td>GitHub</td><td>—</td></tr>
+    <tr><td>인증 미들웨어</td><td>Next.js Middleware</td><td>—</td></tr>
+  </table>
+
+  <h3>9.1 아키텍처 다이어그램</h3>
+  <div style="background:#FAFAFA; border:1px solid #EEE; border-radius:12px; padding:20px; text-align:center; font-size:13px; color:#555;">
+    <div style="margin-bottom:12px;">
+      <span class="tag tag-dark">사용자 (모바일/PC)</span>
+    </div>
+    ↓ HTTPS
+    <div style="margin:12px 0;">
+      <span class="tag tag-dark">Vercel Edge (Middleware 인증)</span>
+    </div>
+    ↓
+    <div style="margin:12px 0;">
+      <span class="tag tag-dark">Next.js App Router (SSR + API Routes)</span>
+    </div>
+    ↓
+    <div style="display:flex; justify-content:center; gap:20px; margin:12px 0;">
+      <span class="tag tag-green">sql.js (WASM DB)</span>
+      <span class="tag tag-blue">JWT Auth</span>
+      <span class="tag tag-orange">File Storage</span>
+    </div>
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============================= -->
+<!-- 10. DB                        -->
+<!-- ============================= -->
+<div class="page">
+  <div class="chapter">
+    <span class="chapter-num">10</span>
+    <span class="chapter-title">데이터베이스 설계 (17 테이블)</span>
+  </div>
+
+  <table>
+    <tr><th>테이블</th><th>용도</th><th>주요 컬럼</th></tr>
+    <tr><td>users</td><td>사용자 계정</td><td>name, phone, password_hash, role, is_approved, referral_source</td></tr>
+    <tr><td>clubs</td><td>동아리 정의</td><td>name, icon, slogan, category, poster_image, curriculum(JSON)</td></tr>
+    <tr><td>club_members</td><td>동아리 멤버십</td><td>club_id, user_id, role(ADMIN/MEMBER)</td></tr>
+    <tr><td>club_applications</td><td>가입 신청</td><td>user_id, club_id, purpose, target_type, status</td></tr>
+    <tr><td>club_sessions</td><td>회차 일정</td><td>club_id, session_no, topic, session_date</td></tr>
+    <tr><td>session_attendees</td><td>출석 관리</td><td>session_id, user_id, status</td></tr>
+    <tr><td>newcomers</td><td>신입생 CRM</td><td>name, phone, status(5단계), prayer_request, how_met</td></tr>
+    <tr><td>activity_logs</td><td>활동 기록</td><td>newcomer_id, content, activity_type</td></tr>
+    <tr><td>prayers</td><td>기도 기록</td><td>newcomer_id, user_id, content</td></tr>
+    <tr><td>mission_appointments</td><td>선교 약속</td><td>appointment_type, title, date, location</td></tr>
+    <tr><td>mission_logs</td><td>선교 기록</td><td>log_type, content, attempt_count</td></tr>
+    <tr><td>posts</td><td>게시글</td><td>board_type, title, content, view_count</td></tr>
+    <tr><td>comments</td><td>댓글</td><td>post_id, parent_id(대댓글), content</td></tr>
+    <tr><td>likes</td><td>좋아요</td><td>user_id, target_type, target_id</td></tr>
+    <tr><td>chat_messages</td><td>대화방</td><td>club_id, content, is_pinned</td></tr>
+    <tr><td>notifications</td><td>알림</td><td>user_id, type, title, message, is_read</td></tr>
+    <tr><td>family_sites</td><td>외부 링크</td><td>title, url, icon</td></tr>
+  </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============================= -->
+<!-- 11. API                       -->
+<!-- ============================= -->
+<div class="page">
+  <div class="chapter">
+    <span class="chapter-num">11</span>
+    <span class="chapter-title">API 설계 (31개 엔드포인트)</span>
+  </div>
+
+  <h3>인증 API (7개)</h3>
+  <table>
+    <tr><th width="15%">Method</th><th>Endpoint</th><th>설명</th></tr>
+    <tr><td>POST</td><td>/api/auth/login</td><td>이름+비밀번호 로그인</td></tr>
+    <tr><td>POST</td><td>/api/auth/register</td><td>회원가입 (관리자 승인 필요)</td></tr>
+    <tr><td>POST</td><td>/api/auth/guest</td><td>테스트 입장 (이름만)</td></tr>
+    <tr><td>POST</td><td>/api/auth/logout</td><td>로그아웃</td></tr>
+    <tr><td>GET</td><td>/api/auth/me</td><td>현재 사용자 정보</td></tr>
+    <tr><td>POST</td><td>/api/auth/refresh</td><td>JWT 토큰 갱신</td></tr>
+    <tr><td>POST</td><td>/api/auth/reset-password</td><td>비밀번호 재설정/변경</td></tr>
+  </table>
+
+  <h3>동아리 API (8개)</h3>
+  <table>
+    <tr><th width="15%">Method</th><th>Endpoint</th><th>설명</th></tr>
+    <tr><td>GET/POST</td><td>/api/clubs</td><td>동아리 목록/생성</td></tr>
+    <tr><td>GET/PUT/DEL</td><td>/api/clubs/[id]</td><td>동아리 상세 (isMember 포함)</td></tr>
+    <tr><td>GET</td><td>/api/clubs/rankings</td><td>동아리 랭킹</td></tr>
+    <tr><td>POST/GET</td><td>/api/clubs/[id]/apply</td><td>선교 참여 신청/목록</td></tr>
+    <tr><td>GET/POST</td><td>/api/clubs/[id]/chat</td><td>대화방 (멤버 검증)</td></tr>
+    <tr><td>GET</td><td>/api/clubs/[id]/members</td><td>멤버 목록 (멤버 검증)</td></tr>
+    <tr><td>GET/POST</td><td>/api/clubs/[id]/newcomers</td><td>신입생 (멤버 검증)</td></tr>
+    <tr><td>GET/POST</td><td>/api/clubs/[id]/sessions</td><td>회차 관리 (멤버 검증)</td></tr>
+  </table>
+
+  <h3>CRM + 선교 + 게시판 + 관리 API (16개)</h3>
+  <table>
+    <tr><th width="15%">Method</th><th>Endpoint</th><th>설명</th></tr>
+    <tr><td>PUT</td><td>/api/applications/[id]</td><td>신청 승인/거절</td></tr>
+    <tr><td>GET</td><td>/api/newcomers/dashboard</td><td>파이프라인 대시보드</td></tr>
+    <tr><td>GET/PUT</td><td>/api/newcomers/[id]</td><td>신입생 상세/수정 (멤버 검증)</td></tr>
+    <tr><td>GET/POST</td><td>/api/newcomers/[id]/logs</td><td>활동 기록 (타입 검증)</td></tr>
+    <tr><td>POST</td><td>/api/newcomers/[id]/pray</td><td>기도하기</td></tr>
+    <tr><td>GET</td><td>/api/mission/dashboard</td><td>선교 현황판</td></tr>
+    <tr><td>GET/POST</td><td>/api/mission/appointments</td><td>약속 관리</td></tr>
+    <tr><td>GET/POST</td><td>/api/mission/logs</td><td>활동 기록</td></tr>
+    <tr><td>GET/POST</td><td>/api/boards/[type]</td><td>게시판</td></tr>
+    <tr><td>GET/PUT/DEL</td><td>/api/posts/[id]</td><td>게시글 CRUD</td></tr>
+    <tr><td>GET/POST</td><td>/api/posts/[id]/comments</td><td>댓글/대댓글</td></tr>
+    <tr><td>POST</td><td>/api/posts/[id]/like</td><td>좋아요 토글</td></tr>
+    <tr><td>POST</td><td>/api/files/upload</td><td>파일 업로드 (20MB)</td></tr>
+    <tr><td>GET</td><td>/api/files/[...path]</td><td>파일 서빙 (인증 필요)</td></tr>
+    <tr><td>GET</td><td>/api/notifications</td><td>알림 목록</td></tr>
+    <tr><td>GET/PUT</td><td>/api/admin/*</td><td>Admin 대시보드/회원관리</td></tr>
+  </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============================= -->
+<!-- 12. 보안                      -->
+<!-- ============================= -->
+<div class="page">
+  <div class="chapter">
+    <span class="chapter-num">12</span>
+    <span class="chapter-title">보안 정책</span>
+  </div>
+
+  <table>
+    <tr><th width="30%">보안 항목</th><th>구현 내용</th></tr>
+    <tr><td>비밀번호 암호화</td><td>bcryptjs (saltRounds: 10)</td></tr>
+    <tr><td>JWT 인증</td><td>httpOnly Cookie, Access Token 30분, Refresh Token 7일</td></tr>
+    <tr><td>자동 토큰 갱신</td><td>25분 인터벌 자동 refresh + 401 시 자동 재시도</td></tr>
+    <tr><td>로그인 잠금</td><td>5회 실패 → 15분 잠금</td></tr>
+    <tr><td>인증 미들웨어</td><td>Next.js Middleware로 공개/보호 경로 자동 분리</td></tr>
+    <tr><td>권한 검증</td><td>동아리 멤버 검증, Admin 전용 API 보호</td></tr>
+    <tr><td>파일 업로드</td><td>20MB 제한, 확장자 화이트리스트 (SVG 차단)</td></tr>
+    <tr><td>파일 서빙</td><td>인증 필요 + Path Traversal 방지 + nosniff 헤더</td></tr>
+    <tr><td>입력 검증</td><td>게시글 10,000자, 댓글 2,000자, 채팅 500자 제한</td></tr>
+    <tr><td>한글 인코딩</td><td>request.text() + JSON.parse() 방식 (WASM 호환)</td></tr>
+    <tr><td>쿠키 보안</td><td>production에서 secure: true, sameSite: lax</td></tr>
+    <tr><td>Admin 자기보호</td><td>자기 자신 비활성화/역할 변경 방지</td></tr>
+  </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============================= -->
+<!-- 13. 디자인                    -->
+<!-- ============================= -->
+<div class="page">
+  <div class="chapter">
+    <span class="chapter-num">13</span>
+    <span class="chapter-title">디자인 가이드</span>
+  </div>
+
+  <h3>13.1 컬러 시스템</h3>
+  <h4>Primary (녹색 계열)</h4>
+  <div class="color-row">
+    <div class="color-chip" style="background:#1E5631;">#1E5631</div>
+    <div class="color-chip" style="background:#2D7A3A;">#2D7A3A</div>
+    <div class="color-chip" style="background:#4CAF50;">#4CAF50</div>
+    <div class="color-chip" style="background:#E8F5E9; color:#1E5631;">#E8F5E9</div>
+    <div class="color-chip" style="background:#F1F8E9; color:#1E5631;">#F1F8E9</div>
+  </div>
+  <h4>Neutral</h4>
+  <div class="color-row">
+    <div class="color-chip" style="background:#1A1A1A;">#1A1A1A</div>
+    <div class="color-chip" style="background:#666;">#666666</div>
+    <div class="color-chip" style="background:#999;">#999999</div>
+    <div class="color-chip" style="background:#EEEEEE; color:#999;">#EEEEEE</div>
+    <div class="color-chip" style="background:#F5F5F5; color:#999;">#F5F5F5</div>
+  </div>
+
+  <h3>13.2 레이아웃 원칙</h3>
+  <ul>
+    <li>모바일 퍼스트: 360~767px 100% 너비, 768px~ max-width 640px 중앙</li>
+    <li>카드: rounded-2xl, 1px #EEE border, subtle shadow</li>
+    <li>버튼: rounded-xl(12px), 녹색 배경 + 흰색 텍스트</li>
+    <li>하단 탭바: 5탭 + 중앙 56px 녹색 원형 홈 버튼</li>
+    <li>헤더: 좌측 메뉴명(→해당 페이지) + 우측 JS MISSION 로고(→홈)</li>
+  </ul>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============================= -->
+<!-- 14. 배포                      -->
+<!-- ============================= -->
+<div class="page">
+  <div class="chapter">
+    <span class="chapter-num">14</span>
+    <span class="chapter-title">배포 및 운영 계획</span>
+  </div>
+
+  <table>
+    <tr><th width="25%">항목</th><th>내용</th></tr>
+    <tr><td>호스팅</td><td>Vercel (서버리스, 글로벌 CDN)</td></tr>
+    <tr><td>도메인</td><td>jsmission.vercel.app (커스텀 도메인 연결 가능)</td></tr>
+    <tr><td>소스코드</td><td>github.com/peopleinside7/jsmission</td></tr>
+    <tr><td>CI/CD</td><td>git push → Vercel 자동 빌드/배포</td></tr>
+    <tr><td>환경변수</td><td>JWT_SECRET (Vercel 설정 완료)</td></tr>
+    <tr><td>DB 운영</td><td>현재: sql.js 인메모리 (데모용)<br>향후: Supabase PostgreSQL 전환 예정</td></tr>
+  </table>
+
+  <h3>14.1 테스트 계정</h3>
+  <table>
+    <tr><th>역할</th><th>이름</th><th>비밀번호</th></tr>
+    <tr><td><span class="tag tag-red">ADMIN</span></td><td>관리자</td><td>admin1234</td></tr>
+    <tr><td><span class="tag tag-green">USER</span></td><td>김성도</td><td>test1234</td></tr>
+    <tr><td><span class="tag tag-gray">GUEST</span></td><td>(이름만 입력)</td><td>불필요</td></tr>
+  </table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ============================= -->
+<!-- 15. 로드맵                    -->
+<!-- ============================= -->
+<div class="page">
+  <div class="chapter">
+    <span class="chapter-num">15</span>
+    <span class="chapter-title">향후 로드맵</span>
+  </div>
+
+  <table>
+    <tr><th>단계</th><th>내용</th><th>예상 시기</th></tr>
+    <tr><td><span class="tag tag-green">V3.1</span></td><td>Supabase PostgreSQL 전환 (데이터 영속성 확보)</td><td>2025 Q2</td></tr>
+    <tr><td><span class="tag tag-green">V3.2</span></td><td>PWA 지원 (오프라인, 푸시 알림)</td><td>2025 Q2</td></tr>
+    <tr><td><span class="tag tag-blue">V3.3</span></td><td>WebSocket 실시간 채팅 (폴링 → WS 전환)</td><td>2025 Q3</td></tr>
+    <tr><td><span class="tag tag-blue">V3.4</span></td><td>SMS 알림 연동 (신입생 미접촉 알림)</td><td>2025 Q3</td></tr>
+    <tr><td><span class="tag tag-orange">V4.0</span></td><td>관계지도 (신입생 네트워크 시각화)</td><td>2025 Q4</td></tr>
+    <tr><td><span class="tag tag-orange">V4.1</span></td><td>다국어 지원 (영어, 일본어)</td><td>2026 Q1</td></tr>
+  </table>
+</div>
+
+<!-- ============================= -->
+<!-- FOOTER                        -->
+<!-- ============================= -->
+<div class="doc-footer">
+  <div class="ft-title">JS MISSION V3.0</div>
+  <p>안산주성령교회 문화선교 플랫폼</p>
+  <p>Developed by Praise Hong</p>
+  <p>https://jsmission.vercel.app</p>
+  <p style="margin-top:16px; opacity:0.5;">COPYRIGHT &copy; 2025 JS MISSION. All Rights Reserved.</p>
+  <p style="opacity:0.4; font-size:11px; margin-top:8px;">본 문서는 내부 기획 보고서이며, 외부 배포 시 사전 승인이 필요합니다.</p>
+</div>
+
+</div><!-- /.doc -->
+</body>
+</html>

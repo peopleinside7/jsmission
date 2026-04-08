@@ -31,7 +31,16 @@ export default function MissionPage() {
 
   useEffect(() => {
     fetch('/api/newcomers/dashboard').then(r => r.json()).then(d => setPipeline(d.pipeline || {})).catch(() => {});
-    fetch('/api/mission/appointments').then(r => r.json()).then(d => setAppointments(d.appointments || [])).catch(() => {});
+    fetch('/api/mission/appointments').then(r => r.json()).then(d => {
+      const appts = d.appointments || [];
+      setAppointments(appts);
+      // 각 약속의 댓글도 자동 로드
+      appts.forEach((a: any) => {
+        fetch(`/api/mission/appointments/${a.id}/comments`).then(r => r.json()).then(cd => {
+          setApptComments(prev => ({ ...prev, [a.id]: cd.comments || [] }));
+        }).catch(() => {});
+      });
+    }).catch(() => {});
     fetch('/api/mission/logs').then(r => r.json()).then(d => setLogs(d.logs || [])).catch(() => {});
   }, []);
 
@@ -49,8 +58,8 @@ export default function MissionPage() {
     }
   };
 
-  const loadApptComments = async (apptId: number) => {
-    if (apptComments[apptId]) return;
+  const loadApptComments = async (apptId: number, force?: boolean) => {
+    if (apptComments[apptId] && !force) return;
     try {
       const res = await fetch(`/api/mission/appointments/${apptId}/comments`);
       if (res.ok) {
@@ -71,12 +80,7 @@ export default function MissionPage() {
       });
       if (res.ok) {
         setNewComment(prev => ({ ...prev, [apptId]: '' }));
-        // Reload comments
-        const r2 = await fetch(`/api/mission/appointments/${apptId}/comments`);
-        if (r2.ok) {
-          const data = await r2.json();
-          setApptComments(prev => ({ ...prev, [apptId]: data.comments || [] }));
-        }
+        await loadApptComments(apptId, true); // 강제 리로드
       }
     } catch { /* ignore */ }
   };
@@ -169,7 +173,10 @@ export default function MissionPage() {
               <div className="text-center py-6 text-[#999] text-sm mb-4">등록된 약속이 없습니다</div>
             ) : appointments.filter(a => a.appointment_type === (tab === 1 ? 'STREET' : 'PROMOTION')).map(a => (
               <div key={a.id} className="card mb-3 overflow-hidden">
-                <div className="p-4" onClick={() => loadApptComments(a.id)}>
+                <div className="p-4 cursor-pointer" onClick={() => loadApptComments(a.id)}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs text-[#999]">{a.creator_name || '작성자'}</span>
+                  </div>
                   <p className="text-sm font-semibold">{a.title}</p>
                   {a.description && <p className="text-xs text-[#666] mt-1">{a.description}</p>}
                   <div className="flex gap-3 mt-1">
@@ -185,8 +192,11 @@ export default function MissionPage() {
                         <div key={c.id} className="flex gap-2">
                           <div className="w-6 h-6 bg-[#E8F5E9] rounded-full flex items-center justify-center text-[10px] font-bold text-[#1E5631] shrink-0">{c.author_name?.[0] || '?'}</div>
                           <div className="flex-1">
-                            <span className="text-xs font-medium text-[#333]">{c.author_name}</span>
-                            <p className="text-xs text-[#555]">{c.content}</p>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-semibold text-[#1E5631]">{c.author_name}</span>
+                              <span className="text-[10px] text-[#BDBDBD]">{new Date(c.created_at).toLocaleDateString('ko-KR')}</span>
+                            </div>
+                            <p className="text-xs text-[#555] mt-0.5">{c.content}</p>
                           </div>
                         </div>
                       ))}

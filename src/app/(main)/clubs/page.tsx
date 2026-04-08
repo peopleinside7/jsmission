@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronRight, Trophy, Users, Target } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Trophy, Users, Plus } from 'lucide-react';
 
 interface Club {
   id: number; name: string; icon: string; icon_color: string; slogan: string;
@@ -15,6 +16,7 @@ const TABS = ['소개', '랭킹', '신청', '일정', '기도방'];
 const CATEGORIES = ['전체', '교육', '스포츠', '문화', '대학사역', '찬양', '기타'];
 
 export default function ClubsPage() {
+  const router = useRouter();
   const [tab, setTab] = useState(0);
   const [clubs, setClubs] = useState<Club[]>([]);
   const [category, setCategory] = useState('전체');
@@ -31,6 +33,7 @@ export default function ClubsPage() {
     <div className="pb-24">
       {/* Header */}
       <div className="bg-[#1E5631] px-4 py-4 flex items-center gap-3">
+        <button onClick={() => router.back()} className="text-white"><ChevronLeft className="w-6 h-6" /></button>
         <Link href="/clubs"><h1 className="text-lg font-bold text-white flex-1">우리교회 선교동아리</h1></Link>
         <Link href="/home"><Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" /></Link>
       </div>
@@ -267,6 +270,7 @@ function ClubCalendar() {
               ))}
             </div>
           )}
+          <p className="text-[10px] text-[#BDBDBD] text-center mt-3">* 관리자는 일정을 추가할 수 있습니다</p>
         </div>
       )}
 
@@ -309,7 +313,15 @@ function PrayerRoom() {
 
   return (
     <div className="space-y-3">
-      <h3 className="text-base font-bold text-[#1A1A1A]">신입생 기도방</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-base font-bold text-[#1A1A1A]">신입생 기도방</h3>
+        <button
+          onClick={() => {/* TODO: 기도 작성 모달 */}}
+          className="text-xs bg-[#1E5631] text-white px-3 py-1.5 rounded-full flex items-center gap-1"
+        >
+          <Plus className="w-3 h-3" /> 기도 작성하기
+        </button>
+      </div>
       {newcomers.length === 0 ? (
         <div className="text-center py-10 text-[#999] text-sm">아직 등록된 신입생이 없습니다</div>
       ) : newcomers.map((n: any) => (

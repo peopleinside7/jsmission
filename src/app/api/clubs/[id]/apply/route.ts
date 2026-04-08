@@ -13,6 +13,17 @@ export async function POST(
     }
 
     const { id } = await params;
+
+    // Parse body BEFORE any DB queries (request body can only be read once)
+    let body: any = {};
+    try {
+      const bodyText = await request.text();
+      body = bodyText ? JSON.parse(bodyText) : {};
+    } catch {
+      // If JSON parsing fails, use empty object
+    }
+    const { purpose, target_type, department, phone } = body;
+
     const db = await initDbAsync();
 
     const club = db.prepare('SELECT * FROM clubs WHERE id = ? AND is_active = 1').get(id) as any;
@@ -39,8 +50,6 @@ export async function POST(
     if (existingApp) {
       return Response.json({ error: '이미 신청 중입니다' }, { status: 409 });
     }
-
-    const { purpose, target_type, department, phone } = JSON.parse(await request.text());
 
     if (club.approval_mode === 'AUTO') {
       // Auto approve

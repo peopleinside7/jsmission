@@ -69,7 +69,7 @@ export default function FeedbackPage() {
       <div className="bg-[#1E5631] px-4 py-3 flex items-center gap-3 sticky top-0 z-40">
         <button onClick={() => router.back()}><ChevronLeft className="w-6 h-6 text-white" /></button>
         <Link href="/feedback"><h1 className="text-base font-bold text-white flex-1">Feedback</h1></Link>
-        <button onClick={() => setShowWrite(true)} className="text-white"><Plus className="w-6 h-6" /></button>
+        <button onClick={() => setShowWrite(true)} className="text-white text-xs bg-white/20 px-3 py-1.5 rounded-full flex items-center gap-1"><Plus className="w-4 h-4" /> 작성하기</button>
         <Link href="/home"><Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" /></Link>
       </div>
 

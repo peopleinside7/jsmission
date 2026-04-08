@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Plus, Search } from 'lucide-react';
+import { ChevronLeft, Plus, Search } from 'lucide-react';
 
 const STAGE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   ATTEMPT: { label: '시도', color: '#5B9A6F', bg: '#EDF5F0' },
@@ -15,6 +16,7 @@ const STAGE_CONFIG: Record<string, { label: string; color: string; bg: string }>
 };
 
 export default function NewcomersPage() {
+  const router = useRouter();
   const [tab, setTab] = useState(0);
   const [pipeline, setPipeline] = useState<Record<string, number>>({});
   const [newcomers, setNewcomers] = useState<any[]>([]);
@@ -61,9 +63,10 @@ export default function NewcomersPage() {
   return (
     <div className="pb-24">
       <div className="bg-[#1E5631] px-4 py-4 flex items-center gap-3">
+        <button onClick={() => router.back()} className="text-white"><ChevronLeft className="w-6 h-6" /></button>
         <Link href="/newcomers"><h1 className="text-lg font-bold text-white flex-1">신입생 상황</h1></Link>
-        <button onClick={() => setShowCreate(true)} className="text-white bg-white/20 p-2 rounded-full">
-          <Plus className="w-5 h-5" />
+        <button onClick={() => setShowCreate(true)} className="text-white text-xs bg-white/20 px-3 py-1.5 rounded-full flex items-center gap-1">
+          <Plus className="w-4 h-4" /> 신입생 등록
         </button>
         <Link href="/home"><Image src="/logo_header.jpg" alt="JS MISSION" width={90} height={22} className="h-[20px] w-auto shrink-0" /></Link>
       </div>

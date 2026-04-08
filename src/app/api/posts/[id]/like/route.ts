@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import { initDbAsync } from '@/lib/db';
+import { initDbAsync, ensureUserExists } from '@/lib/db';
 
 export async function POST(
   request: Request,
@@ -14,6 +14,7 @@ export async function POST(
 
     const { id } = await params;
     const db = await initDbAsync();
+    await ensureUserExists(db, user);
 
     const existing = db.prepare(
       "SELECT id FROM likes WHERE user_id = ? AND target_type = 'POST' AND target_id = ?"

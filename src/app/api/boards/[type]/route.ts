@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import { initDbAsync } from '@/lib/db';
+import { initDbAsync, ensureUserExists } from '@/lib/db';
 
 export async function GET(
   request: Request,
@@ -96,6 +96,7 @@ export async function POST(
     }
 
     const db = await initDbAsync();
+    await ensureUserExists(db, user);
 
     const result = db.prepare(`
       INSERT INTO posts (board_type, club_id, author_id, title, content, file_path, file_name, resource_category)

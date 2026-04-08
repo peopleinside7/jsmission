@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import { initDbAsync } from '@/lib/db';
+import { initDbAsync, ensureUserExists } from '@/lib/db';
 
 export async function POST(
   request: Request,
@@ -25,6 +25,7 @@ export async function POST(
     const { purpose, target_type, department, phone } = body;
 
     const db = await initDbAsync();
+    await ensureUserExists(db, user);
 
     const club = db.prepare('SELECT * FROM clubs WHERE id = ? AND is_active = 1').get(id) as any;
     if (!club) {
@@ -77,7 +78,6 @@ export async function POST(
     console.error('Club apply error:', error);
     return Response.json({
       error: '클럽 신청 중 오류가 발생했습니다',
-      detail: error?.message || String(error),
     }, { status: 500 });
   }
 }

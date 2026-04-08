@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import { initDbAsync } from '@/lib/db';
+import { initDbAsync, ensureUserExists } from '@/lib/db';
 
 // mission_logs 테이블을 댓글 저장소로 활용
 // appointment_id로 연결, content에 댓글 내용 저장
@@ -53,6 +53,7 @@ export async function POST(
     }
 
     const db = await initDbAsync();
+    await ensureUserExists(db, user);
 
     // 약속이 존재하는지 확인
     const appt = db.prepare('SELECT id, appointment_type FROM mission_appointments WHERE id = ?').get(id) as any;

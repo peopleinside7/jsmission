@@ -434,5 +434,16 @@ export async function initDbAsync(): Promise<DatabaseWrapper> {
   return dbPromise;
 }
 
+export async function ensureUserExists(db: any, user: { userId: number; name: string; phone?: string; role?: string }) {
+  const existing = db.prepare('SELECT id FROM users WHERE id = ?').get(user.userId);
+  if (!existing) {
+    const bcrypt = await import('bcryptjs');
+    const hash = await bcrypt.default.hash('guest1234', 10);
+    db.prepare(
+      'INSERT OR IGNORE INTO users (id, name, phone, password_hash, is_approved, role) VALUES (?, ?, ?, ?, 1, ?)'
+    ).run(user.userId, user.name, user.phone || `guest-${user.userId}`, hash, user.role || 'USER');
+  }
+}
+
 export default initDbAsync;
 export { saveToFile };

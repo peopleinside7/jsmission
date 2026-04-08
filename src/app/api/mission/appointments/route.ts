@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import { initDbAsync } from '@/lib/db';
+import { initDbAsync, ensureUserExists } from '@/lib/db';
 
 export async function GET(request: Request) {
   try {
@@ -42,6 +42,7 @@ export async function POST(request: Request) {
     }
 
     const db = await initDbAsync();
+    await ensureUserExists(db, user);
 
     const result = db.prepare(`
       INSERT INTO mission_appointments (appointment_type, title, description, appointment_date, start_time, location, created_by, participants)
@@ -57,6 +58,6 @@ export async function POST(request: Request) {
     return Response.json({ appointment }, { status: 201 });
   } catch (error) {
     console.error('Appointment create error:', error);
-    return Response.json({ error: '약속 생성 중 오류가 발생했습니다' }, { status: 500 });
+    return Response.json({ error: '약속 생성 중 오류가 발생했습니다. 다시 시도해주세요.' }, { status: 500 });
   }
 }

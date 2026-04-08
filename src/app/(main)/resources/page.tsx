@@ -25,7 +25,7 @@ export default function ResourcesPage() {
   const [tab, setTab] = useState(0);
   const [resources, setResources] = useState<any[]>([]);
   const [showUpload, setShowUpload] = useState(false);
-  const [uploadForm, setUploadForm] = useState({ title: '', description: '', category: '' });
+  const [uploadForm, setUploadForm] = useState({ title: '', category: '' });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -64,7 +64,7 @@ export default function ResourcesPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         title: uploadForm.title,
-        content: uploadForm.description,
+        content: null,
         resource_category: currentCategory,
         file_path: filePath,
         file_name: fileName,
@@ -75,7 +75,7 @@ export default function ResourcesPage() {
       const data = await res.json();
       setResources([data.post, ...resources]);
       setShowUpload(false);
-      setUploadForm({ title: '', description: '', category: '' });
+      setUploadForm({ title: '', category: '' });
       setSelectedFile(null);
     }
     setUploading(false);
@@ -182,12 +182,8 @@ export default function ResourcesPage() {
           <div className="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-6" onClick={e => e.stopPropagation()}>
             <h3 className="text-lg font-bold mb-4">{currentCategory} 등록</h3>
             <form onSubmit={handleUpload} className="space-y-3">
-              <div className="flex gap-2">
-                <input className="input-field flex-1" placeholder="제목" required
-                  value={uploadForm.title} onChange={e => setUploadForm({...uploadForm, title: e.target.value})} />
-                <input className="input-field flex-1" placeholder="설명"
-                  value={uploadForm.description} onChange={e => setUploadForm({...uploadForm, description: e.target.value})} />
-              </div>
+              <input className="input-field" placeholder="제목(설명)" required
+                value={uploadForm.title} onChange={e => setUploadForm({...uploadForm, title: e.target.value})} />
               <div className="border-2 border-dashed border-[#E0E0E0] rounded-xl p-4 text-center">
                 <input
                   type="file"

@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import { initDbAsync } from '@/lib/db';
+import { initDbAsync, ensureUserExists } from '@/lib/db';
 
 function checkNewcomerAccess(db: any, newcomerId: string, userId: number, userRole: string): boolean {
   if (userRole === 'ADMIN') return true;
@@ -67,6 +67,7 @@ export async function POST(
     }
 
     const db = await initDbAsync();
+    await ensureUserExists(db, user);
 
     if (!checkNewcomerAccess(db, id, user.userId, user.role)) {
       return Response.json({ error: '권한이 없습니다' }, { status: 403 });

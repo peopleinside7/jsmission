@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import { initDbAsync } from '@/lib/db';
+import { initDbAsync, ensureUserExists } from '@/lib/db';
 
 export async function GET(
   request: Request,
@@ -66,6 +66,7 @@ export async function POST(
 
     const { id } = await params;
     const db = await initDbAsync();
+    await ensureUserExists(db, user);
 
     if (user.role !== 'ADMIN') {
       const isMember = db.prepare('SELECT id FROM club_members WHERE club_id = ? AND user_id = ?').get(id, user.userId);

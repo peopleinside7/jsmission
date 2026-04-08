@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
-import { initDbAsync } from '@/lib/db';
+import { initDbAsync, ensureUserExists } from '@/lib/db';
 
 function checkMembership(db: any, clubId: string, userId: number, userRole: string): boolean {
   if (userRole === 'ADMIN') return true;
@@ -55,6 +55,7 @@ export async function POST(
 
     const { id } = await params;
     const db = await initDbAsync();
+    await ensureUserExists(db, user);
 
     if (!checkMembership(db, id, user.userId, user.role)) {
       return Response.json({ error: '동아리 멤버만 메시지를 보낼 수 있습니다' }, { status: 403 });

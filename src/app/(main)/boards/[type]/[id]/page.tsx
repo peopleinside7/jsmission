@@ -36,19 +36,53 @@ export default function PostDetailPage() {
     }
   };
 
+  const [submitting, setSubmitting] = useState(false);
+
   const submitComment = async () => {
-    if (!newComment.trim()) return;
-    const body: any = { content: newComment };
+    const content = newComment.trim();
+    if (!content || submitting) return;
+    setSubmitting(true);
+
+    const body: any = { content };
     if (replyTo) body.parent_id = replyTo;
-    const res = await fetch(`/api/posts/${params.id}/comments`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (res.ok) {
+
+    try {
+      const res = await fetch(`/api/posts/${params.id}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || '댓글 작성 실패');
+        return;
+      }
+
+      // 낙관적 업데이트: 서버 응답 댓글 즉시 UI에 반영
+      const newC = {
+        ...data.comment,
+        author_name: data.comment.author_name || user?.name || '나',
+        replies: [],
+      };
+      if (body.parent_id) {
+        setComments(prev => prev.map(c =>
+          c.id === body.parent_id ? { ...c, replies: [...(c.replies || []), newC] } : c
+        ));
+      } else {
+        setComments(prev => [...prev, newC]);
+      }
       setNewComment('');
       setReplyTo(null);
-      fetch(`/api/posts/${params.id}/comments`).then(r => r.json()).then(d => setComments(d.comments || [])).catch(() => {});
+
+      // 서버와 동기화 (최종 정합성)
+      fetch(`/api/posts/${params.id}/comments`)
+        .then(r => r.json())
+        .then(d => { if (d.comments) setComments(d.comments); })
+        .catch(() => {});
+    } catch (err) {
+      alert('서버 연결 실패');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -164,7 +198,7 @@ export default function PostDetailPage() {
               onChange={e => setNewComment(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && submitComment()}
             />
-            <button onClick={submitComment} className="w-10 h-10 bg-[#1E5631] rounded-xl flex items-center justify-center shrink-0">
+            <button onClick={submitComment} disabled={submitting || !newComment.trim()} className="w-10 h-10 bg-[#1E5631] rounded-xl flex items-center justify-center shrink-0 disabled:opacity-50 disabled:cursor-not-allowed">
               <Send className="w-5 h-5 text-white" />
             </button>
           </div>

@@ -47,11 +47,33 @@ export async function GET(request: Request) {
     `).all();
 
     const recentPosts = db.prepare(`
-      SELECT p.id, p.title, p.board_type, p.created_at, u.name as author_name
+      SELECT p.id, p.title, p.board_type, p.created_at, u.name as author_name,
+        (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count,
+        (SELECT COUNT(*) FROM likes WHERE target_type = 'POST' AND target_id = p.id) as like_count
       FROM posts p
       JOIN users u ON u.id = p.author_id
       ORDER BY p.created_at DESC
       LIMIT 5
+    `).all();
+
+    // 오늘 통계 (today range)
+    const today = new Date().toISOString().split('T')[0];
+    const todayStart = `${today} 00:00:00`;
+    const todayEnd = `${today} 23:59:59`;
+
+    const todayStats = {
+      newUsers: (db.prepare("SELECT COUNT(*) as c FROM users WHERE created_at BETWEEN ? AND ?").get(todayStart, todayEnd) as any).c,
+      newPosts: (db.prepare("SELECT COUNT(*) as c FROM posts WHERE created_at BETWEEN ? AND ?").get(todayStart, todayEnd) as any).c,
+      newComments: (db.prepare("SELECT COUNT(*) as c FROM comments WHERE created_at BETWEEN ? AND ?").get(todayStart, todayEnd) as any).c,
+      newNewcomers: (db.prepare("SELECT COUNT(*) as c FROM newcomers WHERE created_at BETWEEN ? AND ?").get(todayStart, todayEnd) as any).c,
+    };
+
+    // 게시판별 글 수
+    const boardPostCounts = db.prepare(`
+      SELECT board_type, COUNT(*) as count
+      FROM posts
+      GROUP BY board_type
+      ORDER BY count DESC
     `).all();
 
     const pendingApplications = db.prepare(
@@ -83,6 +105,8 @@ export async function GET(request: Request) {
       recentUsers,
       recentPosts,
       clubStats,
+      todayStats,
+      boardPostCounts,
     });
   } catch (error) {
     console.error('Admin dashboard error:', error);

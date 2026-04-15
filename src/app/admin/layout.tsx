@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutDashboard, Users, BookOpen, Settings, LogOut, Menu, X, MessageSquare } from 'lucide-react';
+import { LayoutDashboard, Users, BookOpen, Settings, LogOut, Menu, X, MessageSquare, Bell, Image as ImageIcon, BarChart3 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/admin', icon: LayoutDashboard, label: '대시보드' },
@@ -13,6 +13,10 @@ const NAV_ITEMS = [
   { href: '/admin/boards', icon: BookOpen, label: '게시판 관리' },
   { href: '/admin/users', icon: Users, label: '회원 관리' },
   { href: '/admin/feedback', icon: MessageSquare, label: '피드백 관리' },
+  { href: '/admin/notifications', icon: Bell, label: '알림 관리' },
+  { href: '/admin/content', icon: ImageIcon, label: '콘텐츠 관리' },
+  { href: '/admin/stats', icon: BarChart3, label: '통계' },
+  { href: '/admin/settings', icon: Settings, label: '설정' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

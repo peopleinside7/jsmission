@@ -406,6 +406,12 @@ function initializeSchema(db: DatabaseWrapper) {
       icon VARCHAR(10),
       display_order INTEGER DEFAULT 0
     );
+
+    CREATE TABLE IF NOT EXISTS app_settings (
+      key VARCHAR(100) PRIMARY KEY,
+      value TEXT,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 }
 

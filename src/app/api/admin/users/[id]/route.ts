@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { getTokenFromRequest } from '@/lib/auth';
 import { initDbAsync } from '@/lib/db';
 
-const VALID_ROLES = ['USER', 'CLUB_ADMIN', 'ADMIN'];
+const VALID_ROLES = ['USER', 'CLUB_ADMIN', 'PASTOR', 'ADMIN'];
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {

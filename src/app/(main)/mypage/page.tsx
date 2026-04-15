@@ -48,6 +48,26 @@ export default function MyPage() {
           </div>
         </div>
 
+        {/* 빠른 메뉴 */}
+        <div className="grid grid-cols-4 gap-2 mb-4">
+          <Link href="/my-posts" className="bg-white rounded-2xl p-3 border border-[#EEE] text-center">
+            <div className="text-xl mb-1">📝</div>
+            <p className="text-[10px] font-medium text-[#333]">내 글</p>
+          </Link>
+          <Link href="/my-comments" className="bg-white rounded-2xl p-3 border border-[#EEE] text-center">
+            <div className="text-xl mb-1">💬</div>
+            <p className="text-[10px] font-medium text-[#333]">내 댓글</p>
+          </Link>
+          <Link href="/bookmarks" className="bg-white rounded-2xl p-3 border border-[#EEE] text-center">
+            <div className="text-xl mb-1">⭐</div>
+            <p className="text-[10px] font-medium text-[#333]">북마크</p>
+          </Link>
+          <Link href="/profile-edit" className="bg-white rounded-2xl p-3 border border-[#EEE] text-center">
+            <div className="text-xl mb-1">⚙️</div>
+            <p className="text-[10px] font-medium text-[#333]">프로필 수정</p>
+          </Link>
+        </div>
+
         {/* 2. 내가 가입한 동아리 */}
         <div className="bg-white rounded-2xl p-4 mb-4 border border-[#EEE]">
           <h3 className="text-sm font-bold text-[#1A1A1A] mb-3 flex items-center gap-2">

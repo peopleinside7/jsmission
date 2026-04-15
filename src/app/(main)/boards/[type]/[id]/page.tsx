@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ChevronLeft, Heart, MessageCircle, Eye, Send } from 'lucide-react';
+import { ChevronLeft, Heart, MessageCircle, Eye, Send, Bookmark, Share2 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -44,6 +44,41 @@ export default function PostDetailPage() {
       const data = await res.json();
       setLiked(data.liked);
       setLikeCount(data.likeCount);
+    }
+  };
+
+  const [bookmarked, setBookmarked] = useState(false);
+  useEffect(() => {
+    fetch('/api/me/bookmarks', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(d => {
+        const found = (d.bookmarks || []).some((b: any) => b.id === parseInt(params.id as string));
+        setBookmarked(found);
+      })
+      .catch(() => {});
+  }, [params.id]);
+
+  const toggleBookmark = async () => {
+    const res = await fetch('/api/me/bookmarks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ post_id: parseInt(params.id as string) }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setBookmarked(data.bookmarked);
+    }
+  };
+
+  const sharePost = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: post?.title, url });
+      } catch { /* user cancelled */ }
+    } else {
+      await navigator.clipboard.writeText(url);
+      alert('URL이 복사되었습니다');
     }
   };
 
@@ -226,15 +261,25 @@ export default function PostDetailPage() {
           )}
         </div>
 
-        {/* Like */}
-        <div className="flex items-center gap-4 py-3 border-y border-[#EEE] mb-4">
-          <button onClick={toggleLike} className={`flex items-center gap-1 text-sm ${liked ? 'text-[#E53935]' : 'text-[#999]'}`}>
-            <Heart className={`w-5 h-5 ${liked ? 'fill-current like-animate' : ''}`} />
-            {likeCount}
-          </button>
-          <span className="flex items-center gap-1 text-sm text-[#999]">
-            <MessageCircle className="w-5 h-5" />{comments.length}
-          </span>
+        {/* Like / Comment / Bookmark / Share */}
+        <div className="flex items-center justify-between py-3 border-y border-[#EEE] mb-4">
+          <div className="flex items-center gap-4">
+            <button onClick={toggleLike} className={`flex items-center gap-1 text-sm ${liked ? 'text-[#E53935]' : 'text-[#999]'}`}>
+              <Heart className={`w-5 h-5 ${liked ? 'fill-current like-animate' : ''}`} />
+              {likeCount}
+            </button>
+            <span className="flex items-center gap-1 text-sm text-[#999]">
+              <MessageCircle className="w-5 h-5" />{comments.length}
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <button onClick={toggleBookmark} className={`text-sm ${bookmarked ? 'text-[#FF9800]' : 'text-[#999]'}`} title="북마크">
+              <Bookmark className={`w-5 h-5 ${bookmarked ? 'fill-current' : ''}`} />
+            </button>
+            <button onClick={sharePost} className="text-sm text-[#999]" title="공유">
+              <Share2 className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Comments */}

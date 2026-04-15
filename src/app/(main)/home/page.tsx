@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Menu, ChevronRight } from 'lucide-react';
+import { Menu, ChevronRight, Search, Bell } from 'lucide-react';
 
 const CATEGORY_CHIPS = [
   { label: '선교동아리', href: '/clubs' },
@@ -38,10 +38,12 @@ export default function HomePage() {
   const [clubs, setClubs] = useState<ClubData[]>([]);
   const [notices, setNotices] = useState<any[]>([]);
   const [activeChip, setActiveChip] = useState<number | null>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     fetch('/api/clubs').then(r => r.json()).then(d => setClubs(d.clubs || [])).catch(() => {});
     fetch('/api/boards/NOTICE').then(r => r.json()).then(d => setNotices((d.posts || []).slice(0, 3))).catch(() => {});
+    fetch('/api/notifications').then(r => r.json()).then(d => setUnreadCount(d.unreadCount || 0)).catch(() => {});
   }, []);
 
   return (
@@ -51,9 +53,17 @@ export default function HomePage() {
         <div className="flex items-center justify-between max-w-[640px] mx-auto">
           {/* 로고 이미지 */}
           <Image src="/logo_header.jpg" alt="JS MISSION" width={150} height={36} className="h-[32px] w-auto" priority />
-          {/* 우측: 사용자명 + 알림 + 메뉴 */}
+          {/* 우측: 검색 + 알림 + My + 메뉴 */}
           <div className="flex items-center gap-3">
-            <span className="text-white/90 text-xs font-medium">{user?.name} 회원님</span>
+            <Link href="/search" title="검색"><Search className="w-5 h-5 text-white/90" /></Link>
+            <Link href="/notifications" className="relative" title="알림">
+              <Bell className="w-5 h-5 text-white/90" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-[#E53935] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </Link>
             <Link href="/mypage" className="text-white/90 text-xs font-medium bg-white/20 px-2.5 py-1 rounded-full">
               My
             </Link>

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import QueryProvider from "@/components/providers/QueryProvider";
 
 export const metadata: Metadata = {
   title: "JS MISSION - 안산주성령교회 문화선교",
@@ -31,7 +32,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-[#F5F5F5]" style={{ fontFamily: "'Pretendard', 'Noto Sans KR', -apple-system, sans-serif" }}>
-        {children}
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );

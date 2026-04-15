@@ -30,6 +30,8 @@ export default function AdminSettingsPage() {
       });
       if (res.ok) {
         setSavedAt(new Date().toLocaleTimeString('ko-KR'));
+        // 사이드바 즉시 갱신
+        window.dispatchEvent(new Event('admin-settings-updated'));
         alert('설정이 저장되었습니다');
       } else {
         alert('저장 실패');

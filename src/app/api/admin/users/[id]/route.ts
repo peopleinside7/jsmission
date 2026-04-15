@@ -51,6 +51,19 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       return Response.json({ message: '역할이 변경되었습니다' });
     }
 
+    // 회원 정보 수정: 이름/연락처/부서 (어느 하나라도 있으면 처리)
+    if (body.name !== undefined || body.phone !== undefined || body.department !== undefined) {
+      const fields: string[] = [];
+      const values: any[] = [];
+      if (body.name !== undefined) { fields.push('name = ?'); values.push(body.name?.trim() || null); }
+      if (body.phone !== undefined) { fields.push('phone = ?'); values.push(body.phone?.trim() || null); }
+      if (body.department !== undefined) { fields.push('department = ?'); values.push(body.department?.trim() || null); }
+      values.push(targetId);
+      db.prepare(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`).run(...values);
+      const updated = db.prepare('SELECT id, name, phone, department, role FROM users WHERE id = ?').get(targetId);
+      return Response.json({ message: '회원 정보가 수정되었습니다', user: updated });
+    }
+
     return Response.json({ error: '올바른 요청이 아닙니다' }, { status: 400 });
   } catch (error) {
     console.error('Admin user update error:', error);

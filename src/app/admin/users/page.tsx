@@ -38,6 +38,28 @@ export default function AdminUsersPage() {
 
   useEffect(() => { loadUsers(); }, []);
 
+  // 인라인 편집 상태
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editForm, setEditForm] = useState({ name: '', phone: '', department: '' });
+
+  const startEdit = (u: any) => {
+    setEditingId(u.id);
+    setEditForm({ name: u.name || '', phone: u.phone || '', department: u.department || '' });
+  };
+
+  const saveEdit = async () => {
+    if (!editForm.name.trim()) { alert('이름은 필수입니다'); return; }
+    const res = await fetch(`/api/admin/users/${editingId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: editForm.name, phone: editForm.phone, department: editForm.department }),
+    });
+    const data = await res.json();
+    if (!res.ok) { alert(data.error || '수정 실패'); return; }
+    setUsers(users.map(u => u.id === editingId ? { ...u, ...editForm } : u));
+    setEditingId(null);
+  };
+
   // 등급 변경
   const handleRoleChange = async (userId: number, newRole: string) => {
     const res = await fetch(`/api/admin/users/${userId}`, {
@@ -180,9 +202,21 @@ export default function AdminUsersPage() {
                   const r = ROLES[u.role] || ROLES.USER;
                   return (
                     <tr key={u.id} className={`hover:bg-[#F7F7F7] ${!u.is_approved ? 'bg-orange-50/30' : ''}`}>
-                      <td className="px-4 py-3 font-medium">{u.name}</td>
-                      <td className="px-4 py-3 text-[#666]">{u.phone || '-'}</td>
-                      <td className="px-4 py-3 text-[#666]">{u.department || '-'}</td>
+                      <td className="px-4 py-3 font-medium">
+                        {editingId === u.id ? (
+                          <input className="input-field text-xs py-1 px-2" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} placeholder="이름" />
+                        ) : u.name}
+                      </td>
+                      <td className="px-4 py-3 text-[#666]">
+                        {editingId === u.id ? (
+                          <input className="input-field text-xs py-1 px-2" value={editForm.phone} onChange={e => setEditForm({...editForm, phone: e.target.value})} placeholder="010-0000-0000" />
+                        ) : (u.phone || '-')}
+                      </td>
+                      <td className="px-4 py-3 text-[#666]">
+                        {editingId === u.id ? (
+                          <input className="input-field text-xs py-1 px-2" value={editForm.department} onChange={e => setEditForm({...editForm, department: e.target.value})} placeholder="부서" />
+                        ) : (u.department || '-')}
+                      </td>
                       <td className="px-4 py-3 text-xs">
                         {u.clubs?.length > 0 ? (
                           <div className="flex flex-wrap gap-1">
@@ -220,17 +254,23 @@ export default function AdminUsersPage() {
                       </td>
                       <td className="px-4 py-3 text-[#999]">{new Date(u.created_at).toLocaleDateString('ko-KR')}</td>
                       <td className="px-4 py-3">
-                        {!u.is_approved && u.role !== 'ADMIN' ? (
+                        {editingId === u.id ? (
                           <div className="flex gap-1">
+                            <button onClick={saveEdit} className="px-2 py-1 bg-[#1E5631] text-white rounded text-xs">저장</button>
+                            <button onClick={() => setEditingId(null)} className="px-2 py-1 bg-[#F5F5F5] text-[#666] rounded text-xs">취소</button>
+                          </div>
+                        ) : !u.is_approved && u.role !== 'ADMIN' ? (
+                          <div className="flex gap-1 flex-wrap">
                             <button onClick={() => handleApprove(u.id)} className="flex items-center gap-1 px-2 py-1 bg-[#1E5631] text-white rounded text-xs">
                               <CheckCircle className="w-3 h-3" /> 승인
                             </button>
                             <button onClick={() => handleReject(u.id)} className="flex items-center gap-1 px-2 py-1 bg-[#E53935] text-white rounded text-xs">
                               <XCircle className="w-3 h-3" /> 거절
                             </button>
+                            <button onClick={() => startEdit(u)} className="px-2 py-1 bg-[#F5F5F5] text-[#666] rounded text-xs">수정</button>
                           </div>
                         ) : (
-                          <span className="text-xs text-[#BDBDBD]">-</span>
+                          <button onClick={() => startEdit(u)} className="px-2 py-1 bg-[#F5F5F5] text-[#666] rounded text-xs hover:bg-[#E0E0E0]">수정</button>
                         )}
                       </td>
                     </tr>

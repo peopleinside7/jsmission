@@ -25,6 +25,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { user, setUser } = useAuthStore();
   const [initialized, setInitialized] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [contactPhone, setContactPhone] = useState('');
+
+  // 대표 연락처 로드 + 설정 변경 이벤트 수신
+  useEffect(() => {
+    const loadContact = () => {
+      fetch('/api/admin/settings', { cache: 'no-store' })
+        .then(r => r.json())
+        .then(d => setContactPhone(d.settings?.contact_phone || ''))
+        .catch(() => {});
+    };
+    loadContact();
+    // 설정 페이지에서 저장 후 'admin-settings-updated' 이벤트 발행 시 즉시 반영
+    const handler = () => loadContact();
+    window.addEventListener('admin-settings-updated', handler);
+    return () => window.removeEventListener('admin-settings-updated', handler);
+  }, []);
 
   useEffect(() => {
     fetch('/api/init').then(() => {
@@ -91,7 +107,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-sm">{user?.name[0]}</div>
           <div>
             <p className="text-sm font-medium">{user?.name}</p>
-            <p className="text-xs text-white/60">{user?.phone}</p>
+            <p className="text-xs text-white/60">{contactPhone || user?.phone || '대표 연락처 미설정'}</p>
           </div>
         </div>
         <button onClick={handleLogout} className="flex items-center gap-2 text-sm text-white/70 hover:text-white">

@@ -32,7 +32,6 @@ export default function ResourcesPage() {
   const currentCategory = TABS[tab];
 
   useEffect(() => {
-    if (tab === 0) return;
     const loadResources = () => {
       fetch(`/api/boards/RESOURCE?category=${encodeURIComponent(currentCategory)}`, { cache: 'no-store' })
         .then(r => r.json())
@@ -54,40 +53,52 @@ export default function ResourcesPage() {
     if (!uploadForm.title) return;
     setUploading(true);
 
-    let filePath = '';
-    let fileName = '';
+    try {
+      let filePath = '';
+      let fileName = '';
 
-    if (selectedFile) {
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      const uploadRes = await fetch('/api/files/upload', { method: 'POST', body: formData });
-      if (uploadRes.ok) {
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        const uploadRes = await fetch('/api/files/upload', { method: 'POST', body: formData });
         const uploadData = await uploadRes.json();
+        if (!uploadRes.ok) {
+          alert(`파일 업로드 실패: ${uploadData.error}${uploadData.detail ? `\n(${uploadData.detail})` : ''}`);
+          setUploading(false);
+          return;
+        }
         filePath = uploadData.filePath;
         fileName = uploadData.fileName;
       }
-    }
 
-    const res = await fetch('/api/boards/RESOURCE', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title: uploadForm.title,
-        content: null,
-        resource_category: currentCategory,
-        file_path: filePath,
-        file_name: fileName,
-      }),
-    });
+      const res = await fetch('/api/boards/RESOURCE', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: uploadForm.title,
+          content: null,
+          resource_category: currentCategory,
+          file_path: filePath,
+          file_name: fileName,
+        }),
+      });
 
-    if (res.ok) {
       const data = await res.json();
+      if (!res.ok) {
+        alert(`등록 실패: ${data.error}`);
+        setUploading(false);
+        return;
+      }
+
       setResources([data.post, ...resources]);
       setShowUpload(false);
       setUploadForm({ title: '', category: '' });
       setSelectedFile(null);
+    } catch (err: any) {
+      alert(`오류: ${err.message || err}`);
+    } finally {
+      setUploading(false);
     }
-    setUploading(false);
   };
 
   const handleDelete = async (postId: number) => {
@@ -113,23 +124,61 @@ export default function ResourcesPage() {
       <div className="page-container pt-4">
         {/* Tab 0: 동아리 홍보지 */}
         {tab === 0 && (
-          <div className="grid grid-cols-2 gap-3">
-            {CLUB_POSTERS.map((p, i) => (
-              <div key={i} className="card overflow-hidden">
-                <div className="relative w-full aspect-[4/3] bg-[#F8F8F8]">
-                  <Image src={p.file} alt={p.name} fill className="object-contain" sizes="180px" />
-                </div>
-                <div className="p-3 flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-semibold text-[#333]">{p.icon} {p.name}</p>
+          <>
+            {/* 기본 7개 동아리 포스터 */}
+            <h3 className="text-sm font-bold text-[#1A1A1A] mb-2">기본 동아리 포스터</h3>
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              {CLUB_POSTERS.map((p, i) => (
+                <div key={i} className="card overflow-hidden">
+                  <div className="relative w-full aspect-[4/3] bg-[#F8F8F8]">
+                    <Image src={p.file} alt={p.name} fill className="object-contain" sizes="180px" />
                   </div>
-                  <a href={p.file} download className="w-7 h-7 bg-[#E8F5E9] rounded-lg flex items-center justify-center">
-                    <Download className="w-3.5 h-3.5 text-[#1E5631]" />
-                  </a>
+                  <div className="p-3 flex items-center justify-between">
+                    <p className="text-xs font-semibold text-[#333]">{p.icon} {p.name}</p>
+                    <a href={p.file} download className="w-7 h-7 bg-[#E8F5E9] rounded-lg flex items-center justify-center">
+                      <Download className="w-3.5 h-3.5 text-[#1E5631]" />
+                    </a>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+
+            {/* 사용자 등록 홍보지 */}
+            {resources.length > 0 && (
+              <>
+                <h3 className="text-sm font-bold text-[#1A1A1A] mb-2">등록된 홍보지</h3>
+                <div className="space-y-2">
+                  {resources.map((r: any) => (
+                    <Link key={r.id} href={`/boards/RESOURCE/${r.id}`} className="card p-4 block hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-[#1A1A1A]">{r.title}</p>
+                          <div className="flex items-center gap-3 mt-1.5">
+                            <span className="text-[10px] text-[#999]">{r.author_name}</span>
+                            <span className="text-[10px] text-[#BDBDBD]">{new Date(r.created_at).toLocaleDateString('ko-KR')}</span>
+                            <span className="text-[10px] text-[#999]">💬 {r.comment_count || 0}</span>
+                            <span className="text-[10px] text-[#999]">❤ {r.like_count || 0}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                          {r.file_path && (
+                            <a href={r.file_path} download={r.file_name || true} onClick={(e) => e.stopPropagation()} className="w-8 h-8 bg-[#E8F5E9] rounded-lg flex items-center justify-center">
+                              <Download className="w-4 h-4 text-[#1E5631]" />
+                            </a>
+                          )}
+                          {(r.author_id === user?.userId || user?.role === 'ADMIN') && (
+                            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(r.id); }} className="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center">
+                              <Trash2 className="w-4 h-4 text-[#E53935]" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </>
+            )}
+          </>
         )}
 
         {/* Tab 1,2: 자료 공유 / 선교 item */}
@@ -159,7 +208,7 @@ export default function ResourcesPage() {
                         {r.file_path && (
                           <a
                             href={r.file_path}
-                            download
+                            download={r.file_name || true}
                             onClick={(e) => e.stopPropagation()}
                             className="w-8 h-8 bg-[#E8F5E9] rounded-lg flex items-center justify-center"
                           >
@@ -184,16 +233,14 @@ export default function ResourcesPage() {
         )}
       </div>
 
-      {/* FAB - 등록하기 */}
-      {tab > 0 && (
-        <button
-          onClick={() => setShowUpload(true)}
-          className="fixed bottom-20 right-4 z-40 bg-[#4CAF50] hover:bg-[#43A047] text-white pl-3 pr-4 py-2.5 rounded-full shadow-lg shadow-[#4CAF50]/30 flex items-center gap-1.5 text-sm font-semibold"
-        >
-          <Plus className="w-4 h-4" />
-          등록하기
-        </button>
-      )}
+      {/* FAB - 등록하기 (모든 탭에서 표시) */}
+      <button
+        onClick={() => setShowUpload(true)}
+        className="fixed bottom-20 right-4 z-40 bg-[#4CAF50] hover:bg-[#43A047] text-white pl-3 pr-4 py-2.5 rounded-full shadow-lg shadow-[#4CAF50]/30 flex items-center gap-1.5 text-sm font-semibold"
+      >
+        <Plus className="w-4 h-4" />
+        {tab === 0 ? '홍보지 등록' : '등록하기'}
+      </button>
 
       {/* Upload Modal */}
       {showUpload && (

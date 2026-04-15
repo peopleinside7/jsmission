@@ -3,6 +3,7 @@ import { getTokenFromRequest } from '@/lib/auth';
 import path from 'path';
 import fs from 'fs';
 
+const IS_VERCEL = !!process.env.VERCEL;
 const UPLOAD_DIR = path.join(process.cwd(), 'data', 'uploads');
 const MAX_SIZE = 20 * 1024 * 1024; // 20MB
 const ALLOWED_EXTENSIONS = [
@@ -34,18 +35,35 @@ export async function POST(request: Request) {
       return Response.json({ error: '허용되지 않는 파일 형식입니다' }, { status: 400 });
     }
 
-    // Ensure upload dir exists
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    // Vercel 서버리스: read-only 파일시스템 → Base64 Data URL로 반환
+    if (IS_VERCEL) {
+      const mimeMap: Record<string, string> = {
+        '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
+        '.gif': 'image/gif', '.webp': 'image/webp', '.pdf': 'application/pdf',
+        '.txt': 'text/plain', '.csv': 'text/csv', '.zip': 'application/zip',
+      };
+      const mime = mimeMap[ext] || 'application/octet-stream';
+      const dataUrl = `data:${mime};base64,${buffer.toString('base64')}`;
+
+      return Response.json({
+        fileName: file.name,
+        filePath: dataUrl,
+        fileSize: file.size,
+      }, { status: 201 });
+    }
+
+    // 로컬 환경: 파일시스템에 저장
     if (!fs.existsSync(UPLOAD_DIR)) {
       fs.mkdirSync(UPLOAD_DIR, { recursive: true });
     }
 
-    // Generate unique filename
     const timestamp = Date.now();
     const safeName = file.name.replace(/[^a-zA-Z0-9가-힣._-]/g, '_');
     const fileName = `${timestamp}_${safeName}`;
     const filePath = path.join(UPLOAD_DIR, fileName);
 
-    const buffer = Buffer.from(await file.arrayBuffer());
     fs.writeFileSync(filePath, buffer);
 
     return Response.json({
@@ -53,8 +71,11 @@ export async function POST(request: Request) {
       filePath: `/api/files/${fileName}`,
       fileSize: file.size,
     }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('File upload error:', error);
-    return Response.json({ error: '파일 업로드 중 오류가 발생했습니다' }, { status: 500 });
+    return Response.json({
+      error: '파일 업로드 중 오류가 발생했습니다',
+      detail: error?.message || String(error),
+    }, { status: 500 });
   }
 }

@@ -36,6 +36,13 @@ export async function GET(
       queryParams.push(user.userId);
     }
 
+    // RESOURCE: filter by category (자료 공유 vs 선교 item 등)
+    const category = url.searchParams.get('category');
+    if (boardType === 'RESOURCE' && category) {
+      whereClause += ' AND p.resource_category = ?';
+      queryParams.push(category);
+    }
+
     const total = db.prepare(
       `SELECT COUNT(*) as count FROM posts p ${whereClause}`
     ).get(...queryParams) as any;

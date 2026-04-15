@@ -134,30 +134,40 @@ export default function ResourcesPage() {
             ) : (
               <div className="space-y-2">
                 {resources.map((r: any) => (
-                  <div key={r.id} className="card p-4">
+                  <Link key={r.id} href={`/boards/RESOURCE/${r.id}`} className="card p-4 block hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-[#1A1A1A]">{r.title}</p>
                         {r.content && <p className="text-xs text-[#666] mt-0.5">{r.content}</p>}
-                        <div className="flex items-center gap-2 mt-1.5">
+                        <div className="flex items-center gap-3 mt-1.5">
                           <span className="text-[10px] text-[#999]">{r.author_name}</span>
                           <span className="text-[10px] text-[#BDBDBD]">{new Date(r.created_at).toLocaleDateString('ko-KR')}</span>
+                          <span className="text-[10px] text-[#999]">💬 {r.comment_count || 0}</span>
+                          <span className="text-[10px] text-[#999]">❤ {r.like_count || 0}</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0 ml-2">
                         {r.file_path && (
-                          <a href={r.file_path} download className="w-8 h-8 bg-[#E8F5E9] rounded-lg flex items-center justify-center">
+                          <a
+                            href={r.file_path}
+                            download
+                            onClick={(e) => e.stopPropagation()}
+                            className="w-8 h-8 bg-[#E8F5E9] rounded-lg flex items-center justify-center"
+                          >
                             <Download className="w-4 h-4 text-[#1E5631]" />
                           </a>
                         )}
                         {(r.author_id === user?.userId || user?.role === 'ADMIN') && (
-                          <button onClick={() => handleDelete(r.id)} className="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center">
+                          <button
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(r.id); }}
+                            className="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center"
+                          >
                             <Trash2 className="w-4 h-4 text-[#E53935]" />
                           </button>
                         )}
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}

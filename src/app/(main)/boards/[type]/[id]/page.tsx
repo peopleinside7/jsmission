@@ -112,7 +112,7 @@ export default function PostDetailPage() {
   if (!post) return <div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-4 border-[#E8F5E9] border-t-[#1E5631] rounded-full animate-spin" /></div>;
 
   return (
-    <div className="pb-24 bg-white min-h-screen">
+    <div className="pb-40 bg-white min-h-screen">
       <div className="bg-[#1E5631] px-4 py-3 flex items-center gap-3 sticky top-0 z-40">
         <button onClick={() => router.back()}><ChevronLeft className="w-6 h-6 text-white" /></button>
         <Link href={`/boards/${params.type}`}><h1 className="text-base font-bold text-white flex-1 truncate">{post.title}</h1></Link>
@@ -194,8 +194,8 @@ export default function PostDetailPage() {
           ))}
         </div>
 
-        {/* Comment Input */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#EEE] p-3 z-30">
+        {/* Comment Input - TabBar(z-40, bottom-0, h-16) 위에 위치 */}
+        <div className="fixed bottom-16 left-0 right-0 bg-white border-t-2 border-[#1E5631]/20 p-3 z-50 shadow-[0_-2px_8px_rgba(0,0,0,0.06)]">
           <div className="max-w-[640px] mx-auto flex gap-2">
             {replyTo && (
               <button onClick={() => setReplyTo(null)} className="text-xs text-[#999] bg-[#F7F7F7] px-2 py-1 rounded shrink-0">

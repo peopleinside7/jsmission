@@ -7,12 +7,12 @@ import Image from 'next/image';
 import { ChevronLeft, Plus, Search } from 'lucide-react';
 
 const STAGE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  ATTEMPT: { label: '시도', color: '#5B9A6F', bg: '#EDF5F0' },
-  PRELIM: { label: '전초', color: '#7BAA8E', bg: '#F0F7F3' },
-  GOSPEL: { label: '말씀연결', color: '#2D7A3A', bg: '#E8F5E9' },
-  WORSHIP: { label: '예배참석', color: '#3D8B5A', bg: '#EAF4ED' },
-  COMPLETE: { label: '수료', color: '#1E5631', bg: '#E3F0E7' },
-  LOST: { label: '이탈', color: '#AAAAAA', bg: '#F5F5F5' },
+  ATTEMPT: { label: '시도',     color: '#7BAA8E', bg: '#EDF5F0' },  // 연녹
+  PRELIM:  { label: '전초',     color: '#FFA726', bg: '#FFF3E0' },  // 밝은 주황
+  GOSPEL:  { label: '말씀연결', color: '#1E5631', bg: '#E8F5E9' },  // 진녹 (핵심)
+  WORSHIP: { label: '예배참석', color: '#42A5F5', bg: '#E3F2FD' },  // 파랑
+  COMPLETE:{ label: '수료',     color: '#FF7043', bg: '#FBE9E7' },  // 진한 주황
+  LOST:    { label: '이탈',     color: '#AAAAAA', bg: '#F5F5F5' },
 };
 
 export default function NewcomersPage() {

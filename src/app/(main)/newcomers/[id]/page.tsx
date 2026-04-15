@@ -7,11 +7,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 const STAGES = [
-  { key: 'ATTEMPT', label: '시도', icon: '🎯', color: '#5B9A6F' },
-  { key: 'PRELIM', label: '전초', icon: '☕', color: '#7BAA8E' },
-  { key: 'GOSPEL', label: '말씀연결', icon: '📖', color: '#2D7A3A' },
-  { key: 'WORSHIP', label: '예배참석', icon: '⛪', color: '#3D8B5A' },
-  { key: 'COMPLETE', label: '수료', icon: '🎓', color: '#1E5631' },
+  { key: 'ATTEMPT',  label: '시도',     icon: '🎯', color: '#7BAA8E' },  // 연녹
+  { key: 'PRELIM',   label: '전초',     icon: '☕', color: '#FFA726' },  // 밝은 주황
+  { key: 'GOSPEL',   label: '말씀연결', icon: '📖', color: '#1E5631' },  // 진녹 (핵심)
+  { key: 'WORSHIP',  label: '예배참석', icon: '⛪', color: '#42A5F5' },  // 파랑
+  { key: 'COMPLETE', label: '수료',     icon: '🎓', color: '#FF7043' },  // 진한 주황
 ];
 
 export default function NewcomerDetailPage() {

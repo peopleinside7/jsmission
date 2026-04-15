@@ -8,7 +8,11 @@ import {
 } from 'lucide-react';
 
 const STAGE_COLORS: Record<string, string> = {
-  ATTEMPT: '#5B9A6F', PRELIM: '#7BAA8E', GOSPEL: '#2D7A3A', WORSHIP: '#3D8B5A', COMPLETE: '#1E5631',
+  ATTEMPT: '#7BAA8E',  // 연녹 - 시작
+  PRELIM:  '#FFA726',  // 밝은 주황 - 관계 형성
+  GOSPEL:  '#1E5631',  // 진녹 - 핵심 (말씀 연결)
+  WORSHIP: '#42A5F5',  // 파랑 - 예배의 평온
+  COMPLETE:'#FF7043',  // 진한 주황 - 결실
 };
 const STAGE_LABELS: Record<string, string> = {
   ATTEMPT: '시도', PRELIM: '전초', GOSPEL: '말씀연결', WORSHIP: '예배참석', COMPLETE: '수료',

@@ -50,62 +50,64 @@ export default function AdminDashboard() {
         <p className="text-xs text-[#999] mt-1">{today}</p>
       </div>
 
-      {/* === 오늘의 요약 === */}
-      <div className="bg-gradient-to-r from-[#1E5631] to-[#2D7A3A] rounded-2xl p-5 mb-6 text-white">
-        <div className="flex items-center gap-2 mb-4">
-          <Sparkles className="w-5 h-5" />
-          <h2 className="text-base font-bold">오늘의 요약</h2>
+      {/* === 오늘의 요약 (컴팩트, 컬러풀) === */}
+      <div className="bg-white rounded-2xl border border-[#EEE] p-3 mb-3">
+        <div className="flex items-center gap-1.5 mb-2 px-1">
+          <Sparkles className="w-3.5 h-3.5 text-[#FF9800]" />
+          <h2 className="text-xs font-bold text-[#666]">오늘의 요약</h2>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-4 gap-2">
           {[
-            { label: '신규 가입', value: stats.todayStats?.newUsers ?? 0, icon: UserPlus },
-            { label: '새 게시글', value: stats.todayStats?.newPosts ?? 0, icon: FileText },
-            { label: '새 댓글', value: stats.todayStats?.newComments ?? 0, icon: MessageSquare },
-            { label: '신규 신입생', value: stats.todayStats?.newNewcomers ?? 0, icon: Target },
+            { label: '신규 가입', value: stats.todayStats?.newUsers ?? 0, icon: UserPlus, color: '#5B9A6F', bg: '#EDF5F0' },
+            { label: '새 게시글', value: stats.todayStats?.newPosts ?? 0, icon: FileText, color: '#1E88E5', bg: '#E3F2FD' },
+            { label: '새 댓글', value: stats.todayStats?.newComments ?? 0, icon: MessageSquare, color: '#9C27B0', bg: '#F3E5F5' },
+            { label: '신규 신입생', value: stats.todayStats?.newNewcomers ?? 0, icon: Target, color: '#FF9800', bg: '#FFF3E0' },
           ].map((s, i) => {
             const Icon = s.icon;
             return (
-              <div key={i} className="bg-white/15 backdrop-blur rounded-xl p-4">
-                <Icon className="w-4 h-4 opacity-70 mb-2" />
-                <p className="text-2xl font-bold">{s.value}</p>
-                <p className="text-xs opacity-80 mt-0.5">{s.label}</p>
+              <div key={i} className="rounded-lg p-2.5 flex items-center gap-2" style={{ backgroundColor: s.bg }}>
+                <Icon className="w-4 h-4 shrink-0" style={{ color: s.color }} />
+                <div className="min-w-0">
+                  <p className="text-base font-bold leading-tight" style={{ color: s.color }}>{s.value}</p>
+                  <p className="text-[10px] text-[#666] leading-tight truncate">{s.label}</p>
+                </div>
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* === 누적 통계 카드 === */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {/* === 누적 통계 카드 (컴팩트, 다양한 색상) === */}
+      <div className="grid grid-cols-4 gap-2 mb-3">
         {[
-          { label: '전체 회원', value: stats.userCount || 0, icon: Users, color: '#1E5631', sub: stats.pendingUsers ? `대기 ${stats.pendingUsers}명` : '' },
-          { label: '동아리', value: stats.clubCount || 0, icon: BookOpen, color: '#4CAF50', sub: '' },
-          { label: '신입생', value: totalNewcomers, icon: Target, color: '#FF9800', sub: '' },
-          { label: '게시글', value: stats.postCount || 0, icon: FileText, color: '#1E88E5', sub: '' },
+          { label: '전체 회원', value: stats.userCount || 0, icon: Users, color: '#5B9A6F', bg: '#EDF5F0', sub: stats.pendingUsers ? `대기 ${stats.pendingUsers}` : '' },
+          { label: '동아리', value: stats.clubCount || 0, icon: BookOpen, color: '#1E88E5', bg: '#E3F2FD', sub: '' },
+          { label: '신입생', value: totalNewcomers, icon: Target, color: '#FF9800', bg: '#FFF3E0', sub: '' },
+          { label: '게시글', value: stats.postCount || 0, icon: FileText, color: '#757575', bg: '#F5F5F5', sub: '' },
         ].map((stat, i) => {
           const Icon = stat.icon;
           return (
-            <div key={i} className="bg-white rounded-2xl border border-[#EEE] p-5">
-              <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: stat.color + '15' }}>
-                  <Icon className="w-5 h-5" style={{ color: stat.color }} />
+            <div key={i} className="bg-white rounded-xl border border-[#EEE] p-3">
+              <div className="flex items-start justify-between mb-1">
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: stat.bg }}>
+                  <Icon className="w-3.5 h-3.5" style={{ color: stat.color }} />
                 </div>
                 {stat.sub && (
-                  <span className="text-[10px] bg-orange-50 text-[#FF9800] px-2 py-0.5 rounded-full">{stat.sub}</span>
+                  <span className="text-[9px] bg-orange-50 text-[#FF9800] px-1.5 py-0.5 rounded-full font-medium">{stat.sub}</span>
                 )}
               </div>
-              <p className="text-3xl font-bold text-[#1A1A1A]">{stat.value}</p>
-              <p className="text-sm text-[#999] mt-1">{stat.label}</p>
+              <p className="text-xl font-bold text-[#1A1A1A] leading-tight">{stat.value}</p>
+              <p className="text-[10px] text-[#999] mt-0.5">{stat.label}</p>
             </div>
           );
         })}
       </div>
 
-      {/* === 처리 필요 알림 === */}
+      {/* === 처리 필요 알림 (컴팩트) === */}
       {(stats.pendingUsers > 0 || stats.pendingApplications > 0) && (
-        <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 mb-6 flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 text-[#FF9800]" />
-          <div className="flex-1 text-sm">
+        <div className="bg-orange-50 border border-orange-200 rounded-xl px-3 py-2 mb-3 flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-[#FF9800] shrink-0" />
+          <div className="flex-1 text-xs">
             <span className="font-bold text-[#FF9800]">처리 필요: </span>
             {stats.pendingUsers > 0 && <Link href="/admin/users" className="underline mr-3">회원 승인 {stats.pendingUsers}건</Link>}
             {stats.pendingApplications > 0 && <Link href="/admin/clubs" className="underline">동아리 신청 {stats.pendingApplications}건</Link>}
@@ -113,24 +115,26 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* === 선교 파이프라인 === */}
-      <div className="bg-white rounded-2xl border border-[#EEE] p-6 mb-6">
-        <h2 className="text-lg font-bold mb-4">선교 파이프라인</h2>
-        <div className="flex gap-2">
+      {/* === 선교 파이프라인 (컴팩트) === */}
+      <div className="bg-white rounded-2xl border border-[#EEE] p-3 mb-6">
+        <div className="flex items-center justify-between mb-2 px-1">
+          <h2 className="text-xs font-bold text-[#666]">선교 파이프라인</h2>
+          <span className="text-[10px] text-[#999]">전체 {totalNewcomers}명</span>
+        </div>
+        <div className="flex items-center gap-1">
           {(['ATTEMPT', 'PRELIM', 'GOSPEL', 'WORSHIP', 'COMPLETE'] as const).map((stage, i) => {
             const count = pipeline[stage] || 0;
             return (
-              <div key={stage} className="flex-1">
-                <div className="h-16 rounded-xl flex flex-col items-center justify-center text-white" style={{ backgroundColor: STAGE_COLORS[stage] }}>
-                  <span className="text-2xl font-bold">{count}</span>
-                  <span className="text-xs opacity-80">{STAGE_LABELS[stage]}</span>
+              <div key={stage} className="flex items-center flex-1">
+                <div className="flex-1 h-9 rounded-lg flex items-center justify-center gap-1.5 text-white" style={{ backgroundColor: STAGE_COLORS[stage] }}>
+                  <span className="text-sm font-bold">{count}</span>
+                  <span className="text-[10px] opacity-90">{STAGE_LABELS[stage]}</span>
                 </div>
-                {i < 4 && <div className="text-center text-[#BDBDBD] text-lg my-1">→</div>}
+                {i < 4 && <span className="text-[#BDBDBD] text-xs px-0.5">›</span>}
               </div>
             );
           })}
         </div>
-        <p className="text-xs text-[#999] text-center mt-3">전체 신입생 {totalNewcomers}명</p>
       </div>
 
       {/* === 게시판별 글 수 차트 + 동아리별 신입생 === */}
@@ -151,7 +155,10 @@ export default function AdminDashboard() {
                       <span className="font-bold text-[#1E5631]">{b.count}건</span>
                     </div>
                     <div className="w-full bg-[#F5F5F5] rounded-full h-2.5 overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-[#1E5631] to-[#4CAF50] transition-all" style={{ width: `${pct}%` }} />
+                      <div className="h-full transition-all" style={{
+                        width: `${pct}%`,
+                        backgroundColor: ['#5B9A6F', '#1E88E5', '#FF9800', '#9C27B0', '#757575'][stats.boardPostCounts.indexOf(b) % 5]
+                      }} />
                     </div>
                   </div>
                 );

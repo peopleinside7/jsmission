@@ -333,6 +333,7 @@ function initializeSchema(db: DatabaseWrapper) {
       file_name VARCHAR(200),
       resource_category VARCHAR(50),
       view_count INTEGER DEFAULT 0,
+      is_pinned INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (club_id) REFERENCES clubs(id) ON DELETE CASCADE,
       FOREIGN KEY (author_id) REFERENCES users(id)

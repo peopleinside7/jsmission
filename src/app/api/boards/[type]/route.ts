@@ -49,13 +49,14 @@ export async function GET(
 
     const posts = db.prepare(`
       SELECT p.*, u.name as author_name,
+        COALESCE(p.is_pinned, 0) as is_pinned,
         (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count,
         (SELECT COUNT(*) FROM likes WHERE target_type = 'POST' AND target_id = p.id) as like_count,
         (SELECT COUNT(*) FROM likes WHERE target_type = 'POST' AND target_id = p.id AND user_id = ?) as is_liked
       FROM posts p
       JOIN users u ON u.id = p.author_id
       ${whereClause}
-      ORDER BY p.created_at DESC
+      ORDER BY COALESCE(p.is_pinned, 0) DESC, p.created_at DESC
       LIMIT ? OFFSET ?
     `).all(user.userId, ...queryParams, limit, offset);
 

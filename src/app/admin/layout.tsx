@@ -68,10 +68,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const Sidebar = () => (
     <>
       <div className="p-5 border-b border-white/10 flex items-center justify-between">
-        <div>
+        <Link href="/home" title="사용자 페이지로 이동" className="hover:opacity-80 transition-opacity">
           <Image src="/logo_header.jpg" alt="JS MISSION" width={120} height={30} className="h-[28px] w-auto" />
           <p className="text-xs text-white/60 mt-1">관리자 패널</p>
-        </div>
+        </Link>
         <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-white/60"><X className="w-5 h-5" /></button>
       </div>
       <nav className="flex-1 py-3">
@@ -106,7 +106,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* 모바일 헤더 */}
       <div className="lg:hidden bg-[#1E5631] px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <button onClick={() => setSidebarOpen(true)}><Menu className="w-6 h-6 text-white" /></button>
-        <Image src="/logo_header.jpg" alt="JS MISSION" width={100} height={24} className="h-[22px] w-auto" />
+        <Link href="/home" title="사용자 페이지로 이동">
+          <Image src="/logo_header.jpg" alt="JS MISSION" width={100} height={24} className="h-[22px] w-auto" />
+        </Link>
         <Link href="/home" className="text-white/80 text-xs">홈</Link>
       </div>
 

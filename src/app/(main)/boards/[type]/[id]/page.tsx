@@ -101,12 +101,76 @@ export default function PostDetailPage() {
     if (!confirm('게시글을 삭제하시겠습니까?')) return;
     const res = await fetch(`/api/posts/${params.id}`, { method: 'DELETE' });
     if (res.ok) router.back();
+    else { const d = await res.json(); alert(d.error || '삭제 실패'); }
   };
 
   const handleDeleteComment = async (commentId: number) => {
     if (!confirm('댓글을 삭제하시겠습니까?')) return;
-    await fetch(`/api/posts/${params.id}/comments/${commentId}`, { method: 'DELETE' });
-    fetch(`/api/posts/${params.id}/comments`).then(r => r.json()).then(d => setComments(d.comments || [])).catch(() => {});
+    const res = await fetch(`/api/posts/${params.id}/comments/${commentId}`, { method: 'DELETE' });
+    if (!res.ok) {
+      const d = await res.json();
+      alert(d.error || '삭제 실패');
+      return;
+    }
+    fetch(`/api/posts/${params.id}/comments`, { cache: 'no-store' })
+      .then(r => r.json()).then(d => setComments(d.comments || [])).catch(() => {});
+  };
+
+  // 게시글 수정 상태
+  const [editingPost, setEditingPost] = useState(false);
+  const [editPostForm, setEditPostForm] = useState({ title: '', content: '' });
+
+  const startEditPost = () => {
+    setEditPostForm({ title: post.title, content: post.content || '' });
+    setEditingPost(true);
+  };
+
+  const saveEditPost = async () => {
+    if (!editPostForm.title.trim()) { alert('제목을 입력해주세요'); return; }
+    const res = await fetch(`/api/posts/${params.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: editPostForm.title, content: editPostForm.content }),
+    });
+    const data = await res.json();
+    if (!res.ok) { alert(data.error || '수정 실패'); return; }
+    setPost({ ...post, title: editPostForm.title, content: editPostForm.content });
+    setEditingPost(false);
+  };
+
+  // 댓글 수정 상태
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
+  const [editCommentText, setEditCommentText] = useState('');
+
+  const startEditComment = (c: any) => {
+    setEditingCommentId(c.id);
+    setEditCommentText(c.content);
+  };
+
+  const saveEditComment = async (commentId: number) => {
+    if (!editCommentText.trim()) return;
+    const res = await fetch(`/api/posts/${params.id}/comments/${commentId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: editCommentText }),
+    });
+    const data = await res.json();
+    if (!res.ok) { alert(data.error || '수정 실패'); return; }
+    // 트리 구조 유지하며 업데이트
+    setComments(prev => prev.map(c => {
+      if (c.id === commentId) return { ...c, content: editCommentText };
+      if (c.replies?.length) {
+        return {
+          ...c,
+          replies: c.replies.map((r: any) =>
+            r.id === commentId ? { ...r, content: editCommentText } : r
+          )
+        };
+      }
+      return c;
+    }));
+    setEditingCommentId(null);
+    setEditCommentText('');
   };
 
   if (!post) return <div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-4 border-[#E8F5E9] border-t-[#1E5631] rounded-full animate-spin" /></div>;
@@ -122,21 +186,44 @@ export default function PostDetailPage() {
       <div className="px-4 pt-4 max-w-[640px] mx-auto">
         {/* Post */}
         <div className="mb-6">
-          <h2 className="text-lg font-bold text-[#1A1A1A] mb-2">{post.title}</h2>
-          <div className="flex items-center gap-3 text-xs text-[#999] mb-2">
-            <span>{post.author_name}</span>
-            <span>{new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
-            <span className="flex items-center gap-0.5"><Eye className="w-3 h-3" />{post.view_count}</span>
-          </div>
-          {(post.author_id === user?.userId || user?.role === 'ADMIN') && (
-            <div className="flex gap-3 mb-4">
-              <button className="text-xs text-[#999] hover:text-[#1E5631]">수정</button>
-              <button onClick={handleDeletePost} className="text-xs text-[#999] hover:text-[#E53935]">삭제</button>
+          {editingPost ? (
+            <div className="space-y-2 mb-4">
+              <input
+                className="input-field font-bold text-lg"
+                value={editPostForm.title}
+                onChange={e => setEditPostForm({ ...editPostForm, title: e.target.value })}
+                placeholder="제목"
+              />
+              <textarea
+                className="input-field min-h-[120px]"
+                value={editPostForm.content}
+                onChange={e => setEditPostForm({ ...editPostForm, content: e.target.value })}
+                placeholder="내용"
+              />
+              <div className="flex gap-2">
+                <button onClick={saveEditPost} className="btn-primary px-4 py-2 text-sm">저장</button>
+                <button onClick={() => setEditingPost(false)} className="btn-outline px-4 py-2 text-sm">취소</button>
+              </div>
             </div>
+          ) : (
+            <>
+              <h2 className="text-lg font-bold text-[#1A1A1A] mb-2">{post.title}</h2>
+              <div className="flex items-center gap-3 text-xs text-[#999] mb-2">
+                <span>{post.author_name}</span>
+                <span>{new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
+                <span className="flex items-center gap-0.5"><Eye className="w-3 h-3" />{post.view_count}</span>
+              </div>
+              {(post.author_id === user?.userId || user?.role === 'ADMIN') && (
+                <div className="flex gap-3 mb-4">
+                  <button onClick={startEditPost} className="text-xs text-[#999] hover:text-[#1E5631]">수정</button>
+                  <button onClick={handleDeletePost} className="text-xs text-[#999] hover:text-[#E53935]">삭제</button>
+                </div>
+              )}
+              <div className="text-sm text-[#333] leading-relaxed whitespace-pre-wrap">
+                {post.content}
+              </div>
+            </>
           )}
-          <div className="text-sm text-[#333] leading-relaxed whitespace-pre-wrap">
-            {post.content}
-          </div>
         </div>
 
         {/* Like */}
@@ -163,11 +250,27 @@ export default function PostDetailPage() {
                     <span className="text-sm font-medium">{comment.author_name}</span>
                     <span className="text-xs text-[#BDBDBD]">{new Date(comment.created_at).toLocaleDateString('ko-KR')}</span>
                   </div>
-                  <p className="text-sm text-[#333] mt-0.5">{comment.content}</p>
+                  {editingCommentId === comment.id ? (
+                    <div className="mt-1 flex gap-2">
+                      <input
+                        className="input-field flex-1 text-sm"
+                        value={editCommentText}
+                        onChange={e => setEditCommentText(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && saveEditComment(comment.id)}
+                      />
+                      <button onClick={() => saveEditComment(comment.id)} className="text-xs bg-[#1E5631] text-white px-2 py-1 rounded">저장</button>
+                      <button onClick={() => setEditingCommentId(null)} className="text-xs text-[#999]">취소</button>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-[#333] mt-0.5">{comment.content}</p>
+                  )}
                   <div className="flex items-center gap-2 mt-1">
                     <button onClick={() => setReplyTo(comment.id)} className="text-xs text-[#999]">답글</button>
-                    {(comment.author_id === user?.userId || user?.role === 'ADMIN') && (
-                      <button onClick={() => handleDeleteComment(comment.id)} className="text-xs text-[#999] hover:text-[#E53935]">삭제</button>
+                    {(comment.author_id === user?.userId || user?.role === 'ADMIN') && editingCommentId !== comment.id && (
+                      <>
+                        <button onClick={() => startEditComment(comment)} className="text-xs text-[#999] hover:text-[#1E5631]">수정</button>
+                        <button onClick={() => handleDeleteComment(comment.id)} className="text-xs text-[#999] hover:text-[#E53935]">삭제</button>
+                      </>
                     )}
                   </div>
                 </div>
@@ -183,9 +286,25 @@ export default function PostDetailPage() {
                       <span className="text-sm font-medium">{reply.author_name}</span>
                       <span className="text-xs text-[#BDBDBD]">{new Date(reply.created_at).toLocaleDateString('ko-KR')}</span>
                     </div>
-                    <p className="text-sm text-[#333] mt-0.5">{reply.content}</p>
-                    {(reply.author_id === user?.userId || user?.role === 'ADMIN') && (
-                      <button onClick={() => handleDeleteComment(reply.id)} className="text-xs text-[#999] hover:text-[#E53935] mt-1">삭제</button>
+                    {editingCommentId === reply.id ? (
+                      <div className="mt-1 flex gap-2">
+                        <input
+                          className="input-field flex-1 text-sm"
+                          value={editCommentText}
+                          onChange={e => setEditCommentText(e.target.value)}
+                          onKeyDown={e => e.key === 'Enter' && saveEditComment(reply.id)}
+                        />
+                        <button onClick={() => saveEditComment(reply.id)} className="text-xs bg-[#1E5631] text-white px-2 py-1 rounded">저장</button>
+                        <button onClick={() => setEditingCommentId(null)} className="text-xs text-[#999]">취소</button>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-[#333] mt-0.5">{reply.content}</p>
+                    )}
+                    {(reply.author_id === user?.userId || user?.role === 'ADMIN') && editingCommentId !== reply.id && (
+                      <div className="flex gap-2 mt-1">
+                        <button onClick={() => startEditComment(reply)} className="text-xs text-[#999] hover:text-[#1E5631]">수정</button>
+                        <button onClick={() => handleDeleteComment(reply.id)} className="text-xs text-[#999] hover:text-[#E53935]">삭제</button>
+                      </div>
                     )}
                   </div>
                 </div>

@@ -19,12 +19,23 @@ export default function PostDetailPage() {
   const [likeCount, setLikeCount] = useState(0);
 
   useEffect(() => {
-    fetch(`/api/posts/${params.id}`).then(r => r.json()).then(d => {
-      setPost(d.post);
-      setLiked(d.post?.is_liked || false);
-      setLikeCount(d.post?.like_count || 0);
-    }).catch(() => {});
-    fetch(`/api/posts/${params.id}/comments`).then(r => r.json()).then(d => setComments(d.comments || [])).catch(() => {});
+    const loadAll = () => {
+      fetch(`/api/posts/${params.id}`, { cache: 'no-store' }).then(r => r.json()).then(d => {
+        setPost(d.post);
+        setLiked(d.post?.is_liked || false);
+        setLikeCount(d.post?.like_count || 0);
+      }).catch(() => {});
+      fetch(`/api/posts/${params.id}/comments`, { cache: 'no-store' })
+        .then(r => r.json()).then(d => setComments(d.comments || [])).catch(() => {});
+    };
+    loadAll();
+    const onVisible = () => { if (document.visibilityState === 'visible') loadAll(); };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', loadAll);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', loadAll);
+    };
   }, [params.id]);
 
   const toggleLike = async () => {

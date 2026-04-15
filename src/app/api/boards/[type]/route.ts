@@ -113,7 +113,14 @@ export async function POST(
       content || null, file_path || null, file_name || null, resource_category || null
     );
 
-    const post = db.prepare('SELECT * FROM posts WHERE id = ?').get(result.lastInsertRowid);
+    // 응답에 author_name + 카운트 포함 (즉시 UI 반영용)
+    const post = db.prepare(`
+      SELECT p.*, u.name as author_name,
+        0 as comment_count, 0 as like_count, 0 as is_liked
+      FROM posts p
+      JOIN users u ON u.id = p.author_id
+      WHERE p.id = ?
+    `).get(result.lastInsertRowid);
 
     return Response.json({ post }, { status: 201 });
   } catch (error) {

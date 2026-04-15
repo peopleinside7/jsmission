@@ -20,10 +20,23 @@ export default function BoardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/boards/${boardType}`).then(r => r.json()).then(d => {
-      setPosts(d.posts || []);
-      setLoading(false);
-    }).catch(() => { setLoading(false); });
+    const loadPosts = () => {
+      fetch(`/api/boards/${boardType}`, { cache: 'no-store' })
+        .then(r => r.json())
+        .then(d => {
+          setPosts(d.posts || []);
+          setLoading(false);
+        }).catch(() => { setLoading(false); });
+    };
+    loadPosts();
+    // 페이지 visibility 변경 시 자동 리페치
+    const onVisible = () => { if (document.visibilityState === 'visible') loadPosts(); };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', loadPosts);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', loadPosts);
+    };
   }, [boardType]);
 
   const handleWrite = async (e: React.FormEvent) => {

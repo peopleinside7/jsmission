@@ -32,12 +32,21 @@ export default function ResourcesPage() {
   const currentCategory = TABS[tab];
 
   useEffect(() => {
-    if (tab > 0) {
-      fetch(`/api/boards/RESOURCE?category=${encodeURIComponent(currentCategory)}`)
+    if (tab === 0) return;
+    const loadResources = () => {
+      fetch(`/api/boards/RESOURCE?category=${encodeURIComponent(currentCategory)}`, { cache: 'no-store' })
         .then(r => r.json())
         .then(d => setResources(d.posts || []))
         .catch(() => setResources([]));
-    }
+    };
+    loadResources();
+    const onVisible = () => { if (document.visibilityState === 'visible') loadResources(); };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', loadResources);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', loadResources);
+    };
   }, [tab, currentCategory]);
 
   const handleUpload = async (e: React.FormEvent) => {
